@@ -4,19 +4,37 @@ import { UpdateUserDto } from './dto/update-user.dto';
 
 @Injectable()
 export class UsersService {
+  users: any[] = [
+    {
+    name: "pierre",
+    coins: 1000,
+    id: 1,
+    },
+    {
+      name: "paul",
+      coins: 1000,
+      id: 2,
+      },
+      {
+        name: "pierre",
+        coins: 1000,
+        id: 3,
+        },
+  ]
+
+  getAllUsers(): any {
+    return this.users;
+  }
+
+  getUserById(id: string): any {
+    return this.users.find((user: any) => user.id === parseInt(id));
+  }
+
+
   create(createUserDto: CreateUserDto) {
-    return 'This action adds a new user';
   }
 
-  findAll() {
-    return `This action returns all users`;
-  }
+  // findOne(id: number) {
+  // }
 
-  findOne(id: number) {
-    return `This action returns a #${id} user`;
-  }
-
-  update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`;
-  }
 }
