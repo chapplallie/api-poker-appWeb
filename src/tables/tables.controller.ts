@@ -18,13 +18,13 @@ export class TablesController {
 
     @Post(':id')
     joinOrLeaveTable(@Param('id') id: string, @Body() body: { action: string, playerId?: number }): string {
+        if (!body.playerId) {
+            throw new BadRequestException('playerId is required');
+        }
         if (body.action === 'join') {
-            if (!body.playerId) {
-                throw new BadRequestException('playerId is required for join action');
-            }
             return this.tablesService.joinTable(id, body.playerId);
         } else if (body.action === 'leave') {
-            return this.tablesService.leaveTable(id);
+            return this.tablesService.leaveTable(id, body.playerId);
         }
         throw new BadRequestException('Invalid action. Must be "join" or "leave"');
     }
