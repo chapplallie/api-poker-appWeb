@@ -9,4 +9,9 @@ export class ActionsController {
     getActions(): any[] {
         return this.actionsService.getActions();
     }
+
+    @Post()
+    makeAction(@Body() body: any): any {
+        return this.actionsService.makeAction(body);
+    }
 }

@@ -29,5 +29,13 @@ export class ActionsService {
         return this.actions;
     }
 
-    
+    makeAction(action: any): any {
+        const selectedAction = this.actions.find(a => a.name === action.name);
+        if (selectedAction) {
+            return selectedAction.description;
+        }
+        return 'Invalid action';
+    }
+
+
 }
