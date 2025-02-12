@@ -1,4 +1,4 @@
-import { Column, Entity, PrimaryGeneratedColumn, Unique } from "typeorm";
+import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity()
 export class User{
@@ -9,15 +9,9 @@ export class User{
     pseudo: string;
 
     @Column()
-    coins: number;
-
-
-    @Column()
     password: string;
 
     
-    @Column() //{unique:true}
-    
+    @Column()
     email: string;
-
 }
