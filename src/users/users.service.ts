@@ -2,24 +2,31 @@ import { Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 
+
 @Injectable()
 export class UsersService {
   users: any[] = [
     {
-    name: "pierre",
-    coins: 1000,
-    id: 1,
+      pseudo: "pierre",
+      coins: 1000,
+      id: 1,
+      email: "loliolol@dkjskfj.fr",
+      password: "string"
     },
     {
-      name: "paul",
+      pseudo: "paul",
       coins: 1000,
       id: 2,
-      },
-      {
-        name: "pierre",
-        coins: 1000,
-        id: 3,
-        },
+       email: "ltest@testj.fr",
+      password: "lolilol147"
+    },
+    {
+      pseudo: "jacques",
+      coins: 1000,
+      id: 3,
+      email: "loliolccaeeiol@dkjskfj.fr",
+      password: "test"
+    },
   ]
 
   getAllUsers(): any {
@@ -30,11 +37,16 @@ export class UsersService {
     return this.users.find((user: any) => user.id === parseInt(id));
   }
 
-
   create(createUserDto: CreateUserDto) {
+    //auto implementation de l'id ???
+    //uuid? Date.start/Date.now/ Date.quelquechose?? => voir doc surement lol
+    const newUser = createUserDto;
+    this.users.push(newUser);
+    return newUser;
   }
 
-  // findOne(id: number) {
-  // }
-
+  updateCoins(userId: number, coins: number) {
+    
+  }
 }
+
