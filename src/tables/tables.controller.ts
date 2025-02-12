@@ -28,4 +28,9 @@ export class TablesController {
         }
         throw new BadRequestException('Invalid action. Must be "join" or "leave"');
     }
+
+    @Post("startGame")
+    startGame(@Param('id') id: string): string {
+        return this.tablesService.startGame(id);
+    }
 }

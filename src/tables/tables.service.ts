@@ -47,4 +47,12 @@ export class TablesService {
         return table;
     }
 
+    startGame(id: string): any {
+        const table = this.tables.find((table: any) => table.id === parseInt(id));
+        if (table) {
+            table.status = "Ongoing";
+        }
+        return table;
+    }
+
 }
