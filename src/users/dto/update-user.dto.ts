@@ -1,4 +1,4 @@
 //extend de createUserDto ??
 export class UpdateUserDto {
-    coins: number;
+    bank: number;
 }

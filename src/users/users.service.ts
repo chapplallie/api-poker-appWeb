@@ -9,50 +9,53 @@ import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UsersService {
-  users: any[] = [
-    {
-      pseudo: "pierre",
-      coins: 1000,
-      id: 1,
-      email: "loliolol@dkjskfj.fr",
-      password: "string"
-    },
-    {
-      pseudo: "paul",
-      coins: 1000,
-      id: 2,
-       email: "ltest@testj.fr",
-      password: "lolilol147"
-    },
-    {
-      pseudo: "jacques",
-      coins: 1000,
-      id: 3,
-      email: "loliolccaeeiol@dkjskfj.fr",
-      password: "test"
-    },
-  ]
+
+  // users: any[] = [
+  //   {
+  //     pseudo: "pierre",
+  //     bank: 1000,
+  //     id: 1,
+  //     email: "loliolol@dkjskfj.fr",
+  //     password: "string"
+  //   },
+  //   {
+  //     pseudo: "paul",
+  //     bank: 1000,
+  //     id: 2,
+  //      email: "ltest@testj.fr",
+  //     password: "lolilol147"
+  //   },
+  //   {
+  //     pseudo: "jacques",
+  //     bank: 1000,
+  //     id: 3,
+  //     email: "loliolccaeeiol@dkjskfj.fr",
+  //     password: "test"
+  //   },
+  // ]
+
   constructor(@InjectRepository(User) private repo : Repository<User>){}
-
-  getAllUsers(): any {
-    return this.users;
+  
+  async getAllUsers(): Promise<User[]> {
+    return await this.repo.find();
   }
 
-  getUserById(id: string): any {
-    return this.users.find((user: any) => user.id === parseInt(id));
+  async getUserById(id: string): Promise<User | null> {
+    return await this.repo.findOne({ where: { id: parseInt(id) } });
   }
-  async create(userData: CreateUserDto) {
+
+  async create(userData: CreateUserDto): Promise<User> {
     const verifyUserEmail = await this.repo.findOne({where: {email: userData.email}});
 
     if (verifyUserEmail) {
         throw new Error("email déjà utilisé.");
     }
+
     if(userData.password){
       const saltOrRounds = 10;
       const password = userData.password;
       const hash = await bcrypt.hash(password, saltOrRounds);
       userData.password = hash;
-      //console.log("ashé : " + hash);
       const newUser = userData;
       let user = this.repo.create(newUser);
       //console.log(newUser);
@@ -69,6 +72,6 @@ export class UsersService {
   //   return newUser;
   // }
 
-  // updateCoins(userId: number, coins: number) { 
+  // updatebank(userId: number, bank: number) { 
   // }
 }

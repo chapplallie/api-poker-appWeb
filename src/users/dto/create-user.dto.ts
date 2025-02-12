@@ -12,7 +12,7 @@ export class CreateUserDto {
 
     @IsInt()
     @Min(0)
-    coins: number;
+    bank: number;
 
     @IsEmail()
     email: string;

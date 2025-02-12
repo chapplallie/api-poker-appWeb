@@ -8,13 +8,14 @@ export class UsersController {
   constructor(private readonly usersService: UsersService) {
   }
   @Get()
-  getUsers(): string {
+  getUsers(): any {
       return this.usersService.getAllUsers();
   }
 
   
   @Get(':id')
-  getUserById(@Param('id') id: string): string {
+  //changer le any svp lol
+  getUserById(@Param('id') id: string): any {
     return this.usersService.getUserById(id);
   }
 
@@ -25,10 +26,10 @@ export class UsersController {
   }
 
   // @Patch(':id')
-  // updateCoins(
+  // updatebank(
   //   @Param('id') id: number,
   //   @Body() UpdateUserDto: UpdateUserDto) {
-  //   return this.usersService.updateCoins(id, UpdateUserDto.coins);
+  //   return this.usersService.updatebank(id, UpdateUserDto.bank);
   // }
 
   @Post('')
