@@ -19,10 +19,6 @@ export class ActionsService {
             name: 'raise',
             description: 'Increase the current bet amount'
         },
-        {
-            name: 'all-in',
-            description: 'Bet all remaining chips'
-        }
     ];
 
     getActions(): any[] {
