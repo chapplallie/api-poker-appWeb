@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
+//import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
 import { Repository } from 'typeorm';
@@ -64,7 +64,12 @@ export class UsersService {
     else{
       throw new Error("mot de passe requis.");
     }
-  }
+  } 
+  
+  
+  // async findOne(username: string): Promise<User | undefined> {
+  //   return this.users.find(user => user.username === username);
+  // }
   // create(createUserDto: CreateUserDto) {
     
   //   const newUser = createUserDto;

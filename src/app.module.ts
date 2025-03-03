@@ -10,6 +10,7 @@ import { User } from './users/entities/user.entity';
 import { UsersModule } from './users/users.module';
 import { UsersController } from './users/users.controller';
 import { UsersService } from './users/users.service';
+import { AuthModule } from './auth/auth.module';
 
 
 @Module({
@@ -18,7 +19,7 @@ import { UsersService } from './users/users.service';
     database: "db.sqlite",
     entities: [User],
     synchronize: true,
-  }), UsersModule],
+  }), UsersModule, AuthModule],
   controllers: [AppController, TablesController, ActionsController],
   providers: [AppService, TablesService, ActionsService],
 })
