@@ -65,7 +65,9 @@ export class UsersService {
       throw new Error("mot de passe requis.");
     }
   } 
-  
+  async findOne(pseudo: string): Promise<User | null> {
+    return this.repo.findOneBy({"pseudo":pseudo});
+  }
   
   // async findOne(username: string): Promise<User | undefined> {
   //   return this.users.find(user => user.username === username);
