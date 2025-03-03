@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Param, Query } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Query, Injectable } from '@nestjs/common';
 import { ActionsService } from './actions.service';
 import { Action, ActionRequest, ActionResponse } from './action.interface';
 

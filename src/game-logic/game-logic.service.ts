@@ -188,14 +188,12 @@ export class GameLogicService {
     }
 
     turnTwo(table: any): any {
-        this.decksService.burn();
         table.river = this.decksService.dealFlop();
         this.rotateRole(table);
         return this.evaluateGameState(table);
     }
 
     turnThree(table: any): any {
-        this.decksService.burn();
         const turnCard = this.decksService.dealTurn();
         table.river.push(turnCard);
         this.rotateRole(table);
@@ -203,7 +201,6 @@ export class GameLogicService {
     }
 
     turnFour(table: any): any {
-        this.decksService.burn();
         const riverCard = this.decksService.dealRiver();
         table.river.push(riverCard);
         this.rotateRole(table);
