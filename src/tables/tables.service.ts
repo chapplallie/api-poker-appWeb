@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { Table, TableJoinResponse, TableActionResponse } from './interfaces/tables.interface';
 import { Player } from '../players/entities/players.entities';
+import { GameLogicService } from '../game-logic/game-logic.service';
 
 @Injectable()
 export class TablesService {
@@ -56,6 +57,8 @@ export class TablesService {
         minPlayers: 2
     }];
 
+    constructor(private readonly gameLogicService: GameLogicService) {}
+
     getTables(): any {
         return this.tables;
     }
@@ -64,11 +67,23 @@ export class TablesService {
         return this.tables.find((table: any) => table.id === parseInt(id));
     }
 
-    joinTable(id: string, playerId: number): any {
+    joinTable(id: string, playerId: number): TableJoinResponse {
         const table = this.tables.find((table: any) => table.id === parseInt(id));
+        
         if (!table) {
-            return null;
+            return {
+                success: false,
+                error: 'Table not found'
+            };
         }
+        
+        if (table.players.some(player => player.id === playerId)) {
+            return {
+                success: false,
+                error: 'Player already joined this table'
+            };
+        }
+        
         table.players.push({
             id: playerId,
             name: "Player " + playerId,
@@ -87,23 +102,74 @@ export class TablesService {
             isCurrentPlayer: false,
             isHuman: true
         });
-        return table;
+        
+        return {
+            success: true,
+            table
+        };
     }
 
-    leaveTable(id: string, playerId: number): any {
+    leaveTable(id: string, playerId: number): TableActionResponse {
         const table = this.tables.find((table: any) => table.id === parseInt(id));
-        if (table) {
-            table.players = table.players.filter((player: any) => player.id !== playerId);
+        
+        if (!table) {
+            return {
+                success: false,
+                error: 'Table not found'
+            };
         }
-        return table;
+        
+        const playerExists = table.players.some(player => player.id === playerId);
+        if (!playerExists) {
+            return {
+                success: false,
+                error: 'Player not found at this table'
+            };
+        }
+        
+        // Logique pour sécuriser les gains dans users
+        
+        table.players = table.players.filter((player: any) => player.id !== playerId);
+        
+        return {
+            success: true,
+            table
+        };
     }
 
-    startGame(id: string): any {
+    startGame(id: string): TableActionResponse {
         const table = this.tables.find((table: any) => table.id === parseInt(id));
-        if (table) {
-            table.status = "Ongoing";
+        
+        if (!table) {
+            return {
+                success: false,
+                error: 'Table not found'
+            };
         }
-        return table;
+        
+        if (table.players.length < table.minPlayers) {
+            return {
+                success: false,
+                error: `Not enough players. Minimum ${table.minPlayers} required.`
+            };
+        }
+        
+        if (table.status === 'Ongoing') {
+            return {
+                success: false,
+                error: 'Game is already in progress'
+            };
+        }
+        
+        table.status = 'Ongoing';
+        
+        // Initialize the game using GameLogicService
+        const gameState = this.gameLogicService.initializeGame(table);
+        
+        return {
+            success: true,
+            table: gameState.table
+        };
     }
 
 }
