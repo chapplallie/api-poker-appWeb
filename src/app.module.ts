@@ -15,7 +15,6 @@ import { AuthModule } from './auth/auth.module';
 import { GameLogicService } from './game-logic/game-logic.service';
 import { PlayersService } from './players/players.service';
 import { DecksService } from './decks/decks.service';
-import { PlayersActionsService } from './players-actions/players-actions.service';
 
 @Module({
   imports: [TypeOrmModule.forRoot({
@@ -24,8 +23,8 @@ import { PlayersActionsService } from './players-actions/players-actions.service
     entities: [User],
     synchronize: true,
   }), UsersModule, AuthModule],
-  controllers: [AppController, TablesController, ActionsController],
-  providers: [AppService, TablesService, ActionsService, GameLogicService, PlayersService, DecksService, PlayersActionsService],
+  controllers: [AppController, TablesController, ActionsController, UsersController],
+  providers: [AppService, TablesService, ActionsService, UsersService, GameLogicService, PlayersService, DecksService],
 })
 export class AppModule {}
 
