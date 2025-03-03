@@ -1,7 +1,9 @@
 import { Controller, Get, Param, Post, Body, BadRequestException } from '@nestjs/common';
 import { TablesService } from './tables.service';
 import { TableActionResponse } from './interfaces/tables.interface';
+import { Public } from '../auth/decorators/public';
 
+@Public()
 @Controller('tables')
 export class TablesController {
     constructor(private readonly tablesService: TablesService) {}
