@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable, forwardRef } from '@nestjs/common';
 import { Action, ActionRequest, ActionResponse } from './action.interface';
 import { PlayersService } from '../players/players.service';
 import { TablesService } from '../tables/tables.service';
@@ -16,6 +16,7 @@ export class ActionsService {
 
     constructor(
         private readonly playersService: PlayersService,
+        @Inject(forwardRef(() => TablesService))
         private readonly tablesService: TablesService
     ) {}
 

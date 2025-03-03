@@ -1,15 +1,17 @@
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import { GameLogicService } from './game-logic.service';
-import { DecksService } from '../decks/decks.service';
-import { PlayersService } from '../players/players.service';
-import { ActionsService } from '../actions/actions.service';
+import { DecksModule } from '../decks/decks.module';
+import { PlayersModule } from '../players/players.module';
+import { ActionsModule } from '../actions/actions.module';
 
 @Module({
+  imports: [
+    DecksModule,
+    PlayersModule,
+    forwardRef(() => ActionsModule)
+  ],
   providers: [
-    GameLogicService,
-    DecksService,
-    PlayersService,
-    ActionsService
+    GameLogicService
   ],
   exports: [
     GameLogicService

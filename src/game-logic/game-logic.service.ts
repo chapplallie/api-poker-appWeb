@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable, forwardRef } from '@nestjs/common';
 import { DecksService } from '../decks/decks.service';
 import { PlayersService } from '../players/players.service';
 import { ActionsService } from '../actions/actions.service';
@@ -8,6 +8,7 @@ export class GameLogicService {
     constructor(
         private readonly decksService: DecksService,
         private readonly playersService: PlayersService,
+        @Inject(forwardRef(() => ActionsService))
         private readonly actionsService: ActionsService,
     ) {}
 

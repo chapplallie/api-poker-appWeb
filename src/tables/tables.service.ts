@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable, forwardRef } from '@nestjs/common';
 import { Table, TableJoinResponse, TableActionResponse } from './interfaces/tables.interface';
 import { Player } from '../players/entities/players.entities';
 import { GameLogicService } from '../game-logic/game-logic.service';
@@ -57,7 +57,10 @@ export class TablesService {
         minPlayers: 2
     }];
 
-    constructor(private readonly gameLogicService: GameLogicService) {}
+    constructor(
+        @Inject(forwardRef(() => GameLogicService))
+        private readonly gameLogicService: GameLogicService
+    ) {}
 
     getTables(): any {
         return this.tables;
