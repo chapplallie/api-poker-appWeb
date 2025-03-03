@@ -163,7 +163,6 @@ export class TablesService {
         
         table.status = 'Ongoing';
         
-        // Initialize the game using GameLogicService
         const gameState = this.gameLogicService.initializeGame(table);
         
         return {
