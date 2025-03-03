@@ -3,31 +3,21 @@ import { Action, ActionRequest, ActionResponse } from './action.interface';
 import { PlayersService } from '../players/players.service';
 import { TablesService } from '../tables/tables.service';
 import { Player } from '../players/entities/players.entities';
+import { Table } from '../tables/interfaces/tables.interface';
+
 @Injectable()
 export class ActionsService {
+    private actions: Action[] = [
+        { name: 'fold', description: 'Abandonner la main' },
+        { name: 'check', description: 'Passer son tour' },
+        { name: 'call', description: 'Suivre la mise' },
+        { name: 'raise', description: 'Relancer la mise' }
+    ];
+
     constructor(
         private readonly playersService: PlayersService,
         private readonly tablesService: TablesService
     ) {}
-
-    private readonly actions: Action[] = [
-        {
-            name: 'fold',
-            description: 'Abandon the current hand'
-        },
-        {
-            name: 'check',
-            description: 'Pass the action to next player without betting'
-        },
-        {
-            name: 'call',
-            description: 'Match the current bet amount'
-        },
-        {
-            name: 'raise',
-            description: 'Increase the current bet amount'
-        },
-    ];
 
     getActions(): Action[] {
         return this.actions;
@@ -41,41 +31,13 @@ export class ActionsService {
             return [];
         }
         
-        return this.actions.map(action => ({
-            ...action,
-            isAvailable: this.isActionAvailable(action.name, player, table)
-        }));
-    }
-
-    private isActionAvailable(actionName: string, player: any, table: any): boolean {
-        if (!player.isCurrentPlayer) {
-            return false;
-        }
+        const possibleActions = this.getPossibleActions(player, table);
         
-        if (player.hasFolded) {
-            return false;
-        }
-        
-        const currentBet = table.currentBet || 0;
-        const playerBet = player.currentBet || 0;
-        
-        switch (actionName) {
-            case 'fold':
-                return currentBet > playerBet || currentBet > 0;
-            
-            case 'check':
-                return currentBet === playerBet;
-            
-            case 'call':
-                return currentBet > playerBet && player.chips >= (currentBet - playerBet);
-            
-            case 'raise':
-                const minRaise = table.currentBlind;
-                return player.chips >= (currentBet - playerBet + minRaise);
-            
-            default:
-                return false;
-        }
+        return this.actions.filter(action => possibleActions.includes(action.name))
+            .map(action => ({
+                ...action,
+                isAvailable: true
+            }));
     }
 
     makeAction(actionRequest: ActionRequest): ActionResponse {
@@ -83,38 +45,27 @@ export class ActionsService {
         const selectedAction = this.actions.find(a => a.name === name);
         
         if (!selectedAction) {
-            return {
-                success: false,
-                message: 'Invalid action'
-            };
+            return { success: false, message: 'Action invalide' };
         }
 
-        if (!this.validateAction(name, playerId, amount)) {
-            return {
-                success: false,
-                message: `Cannot perform action '${name}'`
-            };
+        const player = this.getPlayer(playerId);
+        const table = this.getPlayerTable(playerId);
+        
+        if (!this.validateAction(player, name, amount)) {
+            return { success: false, message: `Impossible d'effectuer l'action '${name}'` };
         }
 
-        this.executeAction(name, playerId, amount);
+        this.executeAction(player, name, amount);
 
         return {
             success: true,
-            message: `Action '${name}' performed successfully`,
+            message: `Action '${name}' effectuée avec succès`,
             action: selectedAction
         };
     }
 
-    private validateAction(actionName: string, playerId: number, amount?: number): boolean {
-        // Logique pour valider si l'action est possible
-        // Par exemple, vérifier si le joueur a assez de jetons pour un raise
-        return true;
-    }
-
-    private executeAction(actionName: string, playerId: number, amount?: number): void {
-        const player = this.getPlayer(playerId);
-        
-        switch (actionName) {
+    executeAction(player: Player, action: string, amount?: number): void {
+        switch (action) {
             case 'fold':
                 this.playersService.fold(player);
                 break;
@@ -128,13 +79,72 @@ export class ActionsService {
                 this.playersService.raise(player, amount || 0);
                 break;
             default:
-                break;
+                throw new Error(`Action non reconnue: ${action}`);
         }
     }
 
-    private getPlayer(playerId: number): any {
-        // Récupérer les informations du joueur
-        // Cette méthode pourrait appeler un service pour obtenir les détails du joueur
-        return { id: playerId }; // Simplifié pour l'exemple
+    getPossibleActions(player: Player, table: Table): string[] {
+        const possibleActions: string[] = [];
+        
+        if (!player.isCurrentPlayer || player.hasFolded) {
+            return possibleActions;
+        }
+        
+        const currentBet = table.currentBet || 0;
+        const playerBet = player.currentBet || 0;
+        
+        if (currentBet > playerBet || currentBet > 0) {
+            possibleActions.push('fold');
+        }
+        
+        if (currentBet === playerBet) {
+            possibleActions.push('check');
+        }
+        
+        if (currentBet > playerBet && player.chips >= (currentBet - playerBet)) {
+            possibleActions.push('call');
+        }
+        
+        const minRaise = table.currentBlind;
+        if (player.chips >= (currentBet - playerBet + minRaise)) {
+            possibleActions.push('raise');
+        }
+        
+        return possibleActions;
+    }
+
+    validateAction(player: Player, action: string, amount?: number): boolean {
+        if (!player || !action) {
+            return false;
+        }
+        
+        if (player.hasFolded) {
+            return false;
+        }
+        
+        switch (action) {
+            case 'fold':
+                return true;
+                
+            case 'check':
+                return player.currentBet === player.currentBet;
+                
+            case 'call':
+                return player.chips >= (amount || 0);
+                
+            case 'raise':
+                return !!amount && player.chips >= amount;
+                
+            default:
+                return false;
+        }
+    }
+
+    private getPlayer(playerId: number): Player {
+        return { id: playerId } as Player;
+    }
+
+    private getPlayerTable(playerId: number): Table {
+        return {} as Table;
     }
 }
