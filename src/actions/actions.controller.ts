@@ -1,17 +1,29 @@
-import { Controller, Get, Post, Body } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Query } from '@nestjs/common';
 import { ActionsService } from './actions.service';
+import { Action, ActionRequest, ActionResponse } from './action.interface';
 
 @Controller('actions')
 export class ActionsController {
     constructor(private readonly actionsService: ActionsService) {}
 
     @Get()
-    getActions(): any[] {
+    getActions(): Action[] {
         return this.actionsService.getActions();
     }
 
+    @Get('available')
+    getAvailableActions(
+        @Query('playerId') playerId: string,
+        @Query('tableId') tableId: string
+    ): Action[] {
+        return this.actionsService.getAvailableActions(
+            parseInt(playerId, 10),
+            parseInt(tableId, 10)
+        );
+    }
+
     @Post()
-    makeAction(@Body() body: any): any {
-        return this.actionsService.makeAction(body);
+    makeAction(@Body() actionRequest: ActionRequest): ActionResponse {
+        return this.actionsService.makeAction(actionRequest);
     }
 }
