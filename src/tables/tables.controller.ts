@@ -1,23 +1,23 @@
 import { Controller, Get, Param, Post, Body, BadRequestException } from '@nestjs/common';
 import { TablesService } from './tables.service';
+import { TableActionResponse } from './interfaces/tables.interface';
 
 @Controller('tables')
 export class TablesController {
     constructor(private readonly tablesService: TablesService) {}
 
     @Get()
-    getTables(): string {
+    getTables(): any {
         return this.tablesService.getTables();
     }
 
     @Get(':id')
-    getTableById(@Param('id') id: string): string {
+    getTableById(@Param('id') id: string): any {
         return this.tablesService.getTableById(id);
     }
 
-
     @Post(':id')
-    joinOrLeaveTable(@Param('id') id: string, @Body() body: { action: string, playerId?: number }): string {
+    joinOrLeaveTable(@Param('id') id: string, @Body() body: { action: string, playerId?: number }): TableActionResponse {
         if (!body.playerId) {
             throw new BadRequestException('playerId is required');
         }
@@ -29,8 +29,8 @@ export class TablesController {
         throw new BadRequestException('Invalid action. Must be "join" or "leave"');
     }
 
-    @Post("startGame")
-    startGame(@Param('id') id: string): string {
+    @Post(':id/start')
+    startGame(@Param('id') id: string): TableActionResponse {
         return this.tablesService.startGame(id);
     }
 }

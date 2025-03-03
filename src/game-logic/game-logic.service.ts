@@ -1,14 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import { DecksService } from '../decks/decks.service';
 import { PlayersService } from '../players/players.service';
-import { PlayersActionsService } from '../players-actions/players-actions.service';
+import { ActionsService } from '../actions/actions.service';
 
 @Injectable()
 export class GameLogicService {
     constructor(
         private readonly decksService: DecksService,
         private readonly playersService: PlayersService,
-        private readonly playersActionsService: PlayersActionsService,
+        private readonly actionsService: ActionsService,
     ) {}
 
     initializeGame(table: any): any {
@@ -36,11 +36,11 @@ export class GameLogicService {
 
         const currentPlayer = this.getCurrentPlayer(table);
         
-        const possibleActions = this.playersActionsService.getPossibleActions(currentPlayer, table);
+        const possibleActions = this.actionsService.getPossibleActions(currentPlayer, table);
 
         if (currentPlayer.isAI) {
             const action = this.getAIAction(currentPlayer, table);
-            this.playersActionsService.executeAction(currentPlayer, action.type, action.amount);
+            this.actionsService.executeAction(currentPlayer, action.type, action.amount);
             return this.evaluateGameState(table);
         }
 
@@ -137,7 +137,7 @@ export class GameLogicService {
     }
 
     private getAIAction(player: any, table: any): { type: string, amount: number } {
-        const possibleActions = this.playersActionsService.getPossibleActions(player, table);
+        const possibleActions = this.actionsService.getPossibleActions(player, table);
         
         const actionTypes = Object.keys(possibleActions);
         const randomActionType = actionTypes[Math.floor(Math.random() * actionTypes.length)];
