@@ -1,4 +1,4 @@
-export interface ActionDto {
+export class ActionDto {
   name: string;
   description: string;
   isAvailable?: boolean;
@@ -6,13 +6,13 @@ export interface ActionDto {
   maxAmount?: number;
 }
 
-export interface ActionRequestDto {
+export class ActionRequestDto {
   name: string;
   playerId: number;
   amount?: number;
 }
 
-export interface ActionResponseDto {
+export class ActionResponseDto {
   success: boolean;
   message: string;
   action?: ActionDto;
