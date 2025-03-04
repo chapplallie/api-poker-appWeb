@@ -3,16 +3,18 @@ import { TablesService } from './tables.service';
 import { TableActionResponseDto } from './dto/tables.dto';
 import { Public } from '../auth/decorators/public';
 
-@Public()
+
 @Controller('tables')
 export class TablesController {
     constructor(private readonly tablesService: TablesService) {}
 
+    @Public()
     @Get()
     getTables(): any {
         return this.tablesService.getTables();
     }
 
+    @Public()
     @Get(':id')
     getTableById(@Param('id') id: string): any {
         return this.tablesService.getTableById(id);

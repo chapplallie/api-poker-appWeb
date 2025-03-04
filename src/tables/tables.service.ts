@@ -25,7 +25,7 @@ export class TablesService {
     {
         id: 2,
         name: "Intermediate Table",
-        status: "Ongoing", 
+        status: "Waiting", 
         round: 1,
         turn: 1,
         currentBlind: 50,
@@ -42,7 +42,7 @@ export class TablesService {
     {
         id: 3,
         name: "Advanced Table",
-        status: "Ongoing", 
+        status: "Waiting", 
         round: 1,
         turn: 1,
         currentBlind: 100,
