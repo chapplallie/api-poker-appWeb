@@ -40,7 +40,7 @@ export class GameLogicService {
         
         if (currentPlayer.isAI) {
             const action = this.getAIAction(currentPlayer, table);
-            this.actionsService.executeAction(currentPlayer, action.type, action.amount);
+            this.actionsService.executeAction(currentPlayer, action.type, table, action.amount);
             this.moveToNextPlayer(table);
             return this.evaluateGameState(table);
         }
