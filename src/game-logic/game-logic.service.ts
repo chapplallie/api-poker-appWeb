@@ -188,8 +188,8 @@ export class GameLogicService {
     }
 
     turnTwo(table: any): any {
-        this.decksService.burn();
-        table.river = this.decksService.dealFlop();
+        //this.decksService.burn();
+        //table.river = this.decksService.dealFlop();
         this.rotateRole(table);
         return this.evaluateGameState(table);
     }
