@@ -9,8 +9,8 @@ export class User{
     @Column()
     pseudo: string;
 
-    @Column()
-    bank: number;
+    // @Column()
+    // bank: number;
 
 
     @Column()
@@ -23,8 +23,8 @@ export class User{
 
       
 //pour ajouter victory table => suppr db.sqlite + npm install @nestjs/typeorm typeorm sqlite3
-    @Column()
-    @Min(0)
-    victoryStats: number;
+    // @Column()
+    // @Min(0)
+    // victoryStats: number;
 
 }
