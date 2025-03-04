@@ -4,6 +4,7 @@ import { PlayersService } from '../players/players.service';
 import { TablesService } from '../tables/tables.service';
 import { Player } from '../players/entities/players.entities';
 import { TableDto } from '../tables/dto/tables.dto';
+import { Table } from 'typeorm';
 
 @Injectable()
 export class ActionsService {
@@ -56,7 +57,7 @@ export class ActionsService {
             return { success: false, message: `Impossible d'effectuer l'action '${name}'` };
         }
 
-        this.executeAction(player, name, amount);
+        this.executeAction(player, name, table, amount);
 
         return {
             success: true,
@@ -65,13 +66,13 @@ export class ActionsService {
         };
     }
 
-    executeAction(player: Player, action: string, amount?: number): void {
+    executeAction(player: Player, action: string, table: TableDto, amount?: number): void {
         switch (action) {
             case 'fold':
                 this.playersService.fold(player);
                 break;
             case 'check':
-                this.playersService.check(player);
+                this.playersService.check(player, table);
                 break;
             case 'call':
                 this.playersService.call(player, amount || 0);
@@ -149,3 +150,7 @@ export class ActionsService {
         return {} as TableDto;
     }
 }
+function getTableById() {
+    throw new Error('Function not implemented.');
+}
+

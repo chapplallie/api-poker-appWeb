@@ -3,7 +3,7 @@ export class Player {
   name: string;
   chips: number;
   hand: Card[];
-  tableId?: number;
+  tableId: number;
   position: number;
   hasFolded: boolean;
   hasPlayed: boolean;
