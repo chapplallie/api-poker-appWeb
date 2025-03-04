@@ -27,6 +27,7 @@ export class GameLogicService {
     }
 
     evaluateGameState(table: any): any {
+        console.log(table);
         if (this.isRoundComplete(table)) {
             return this.evaluateEndRound(table);
         }
@@ -37,19 +38,22 @@ export class GameLogicService {
 
         const currentPlayer = this.getCurrentPlayer(table);
         
-        const possibleActions = this.actionsService.getPossibleActions(currentPlayer, table);
-
         if (currentPlayer.isAI) {
             const action = this.getAIAction(currentPlayer, table);
-            this.actionsService.executeAction(currentPlayer, action.type, table, action.amount);
+            this.actionsService.executeAction(currentPlayer, action.type, action.amount);
+            this.moveToNextPlayer(table);
             return this.evaluateGameState(table);
         }
 
-        return {
-            table,
-            currentPlayer,
-            possibleActions
-        };
+        if (currentPlayer.isHuman) {
+            const possibleActions = this.actionsService.getPossibleActions(currentPlayer, table);
+            this.moveToNextPlayer(table);
+            return {
+                table,
+                currentPlayer,
+                possibleActions
+            };
+        }
     }
 
     private isRoundComplete(table: any): boolean {
@@ -171,14 +175,16 @@ export class GameLogicService {
         const smallBlindPos = (table.dealerPosition + 1) % table.players.length;
         const bigBlindPos = (table.dealerPosition + 2) % table.players.length;
         
-        table.players.forEach((p: any)   => {
-            p.role = null;
+        table.players.forEach((p: any) => {
+            p.isDealer = false;
+            p.isSmallBlind = false;
+            p.isBigBlind = false;
             p.isCurrentPlayer = false;
         });
         
-        table.players[table.dealerPosition].role = 'dealer';
-        table.players[smallBlindPos].role = 'smallBlind';
-        table.players[bigBlindPos].role = 'bigBlind';
+        table.players[table.dealerPosition].isDealer = true;
+        table.players[smallBlindPos].isSmallBlind = true;
+        table.players[bigBlindPos].isBigBlind = true;
         
         this.playersService.placeBet(table.players[smallBlindPos], table.currentBlind);
         this.playersService.placeBet(table.players[bigBlindPos], table.currentBlind * 2);
@@ -219,12 +225,15 @@ export class GameLogicService {
         const randomIndex = Math.floor(Math.random() * table.players.length);
         table.dealerPosition = randomIndex;
         
+        table.players[randomIndex].isDealer = true;
 
         const smallBlindPos = (randomIndex + 1) % table.players.length;
         const bigBlindPos = (randomIndex + 2) % table.players.length;
         
-        table.players[smallBlindPos].role = 'smallBlind';
-        table.players[bigBlindPos].role = 'bigBlind';
+        table.players[smallBlindPos].isSmallBlind = true;
+        table.players[bigBlindPos].isBigBlind = true;
+        const nextPlayerPos = (bigBlindPos + 1) % table.players.length;
+        table.players[nextPlayerPos].isCurrentPlayer = true;
         
         this.playersService.placeBet(table.players[smallBlindPos], table.currentBlind);
         this.playersService.placeBet(table.players[bigBlindPos], table.currentBlind * 2);
@@ -236,14 +245,23 @@ export class GameLogicService {
         const smallBlindPos = (table.dealerPosition + 1) % table.players.length;
         const bigBlindPos = (table.dealerPosition + 2) % table.players.length;
         
-        table.players.forEach((p: any) => p.role = null);
+        table.players.forEach((p: any) => {
+            p.isDealer = false;
+            p.isSmallBlind = false;
+            p.isBigBlind = false;
+            p.isCurrentPlayer = false;
+        });
         
-        table.players[table.dealerPosition].role = 'dealer';
-        table.players[smallBlindPos].role = 'smallBlind';
-        table.players[bigBlindPos].role = 'bigBlind';
+        table.players[table.dealerPosition].isDealer = true;
+        table.players[smallBlindPos].isSmallBlind = true;
+        table.players[bigBlindPos].isBigBlind = true;
         
         const nextPlayerPos = (bigBlindPos + 1) % table.players.length;
-        table.players.forEach((p: any) => p.isCurrentPlayer = false);
+        table.players[nextPlayerPos].isCurrentPlayer = true;
+    }
+
+    moveToNextPlayer(table: any): void {
+        const nextPlayerPos = (table.currentPlayer.position + 1) % table.players.length;
         table.players[nextPlayerPos].isCurrentPlayer = true;
     }
 
