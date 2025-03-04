@@ -23,6 +23,8 @@ export class GameLogicService {
         table.round = 1;
         table.turn = 1;
         
+        table.currentBet = table.bigBlind;
+        
         return this.evaluateGameState(table);
     }
 
@@ -40,6 +42,7 @@ export class GameLogicService {
         
         if (currentPlayer.isAI) {
             const action = this.getAIAction(currentPlayer, table);
+            console.log('AI player play', action);
             this.actionsService.executeAction(currentPlayer, action.type, table, action.amount);
             this.moveToNextPlayer(table);
             return this.evaluateGameState(table);
@@ -58,15 +61,29 @@ export class GameLogicService {
 
     private isRoundComplete(table: any): boolean {
         const activePlayers = table.players.filter((p: any) => !p.hasFolded);
-        if (activePlayers.length === 1) return true;
+        if (activePlayers.length === 1) {
+            table.currentBet = table.bigBlind;
+            return true;
+        }
         
         const allBetsEqual = activePlayers.every((p: any) => p.currentBet === table.currentBet);
-        return allBetsEqual && table.turn === 4;
+        if (allBetsEqual && table.turn === 4) {
+            table.currentBet = 0;
+            return true;
+        }
+        
+        return false;
     }
 
     private isTurnComplete(table: any): boolean {
         const activePlayers = table.players.filter((p: any) => !p.hasFolded);
-        return activePlayers.every((p: any) => p.currentBet === table.currentBet);
+        const isComplete = activePlayers.every((p: any) => p.currentBet === table.currentBet);
+        
+        if (isComplete) {
+            table.currentBet = table.bigBlind;
+        }
+        
+        return isComplete;
     }
 
     private getCurrentPlayer(table: any): any {
@@ -144,8 +161,7 @@ export class GameLogicService {
     private getAIAction(player: any, table: any): { type: string, amount: number } {
         const possibleActions = this.actionsService.getPossibleActions(player, table);
         
-        const actionTypes = Object.keys(possibleActions);
-        const randomActionType = actionTypes[Math.floor(Math.random() * actionTypes.length)];
+        const randomActionType = possibleActions[Math.floor(Math.random() * possibleActions.length)];
         
         let amount = 0;
         if (randomActionType === 'raise') {
@@ -261,7 +277,17 @@ export class GameLogicService {
     }
 
     moveToNextPlayer(table: any): void {
-        const nextPlayerPos = (table.currentPlayer.position + 1) % table.players.length;
+        const currentPlayer = this.getCurrentPlayer(table);
+        
+        if (!currentPlayer) {
+            console.error('No current player found');
+            return;
+        }
+        
+        currentPlayer.isCurrentPlayer = false;
+        
+        const nextPlayerPos = (currentPlayer.position + 1) % table.players.length;
+        
         table.players[nextPlayerPos].isCurrentPlayer = true;
     }
 
