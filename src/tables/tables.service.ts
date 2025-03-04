@@ -1,11 +1,11 @@
 import { Inject, Injectable, forwardRef } from '@nestjs/common';
-import { Table, TableJoinResponse, TableActionResponse } from './dto/tables.dto';
+import { TableDto, TableJoinResponseDto, TableActionResponseDto } from './dto/tables.dto';
 import { Player } from '../players/entities/players.entities';
 import { GameLogicService } from '../game-logic/game-logic.service';
 
 @Injectable()
 export class TablesService {
-    tables: Table[] = [{
+    tables: TableDto[] = [{
         id: 1,
         name: "Beginner Table",
         status: "Waiting",
@@ -70,7 +70,7 @@ export class TablesService {
         return this.tables.find((table: any) => table.id === parseInt(id));
     }
 
-    joinTable(id: string, playerId: number): TableJoinResponse {
+    joinTable(id: string, playerId: number): TableJoinResponseDto {
         const table = this.tables.find((table: any) => table.id === parseInt(id));
         
         if (!table) {
@@ -112,7 +112,7 @@ export class TablesService {
         };
     }
 
-    leaveTable(id: string, playerId: number): TableActionResponse {
+    leaveTable(id: string, playerId: number): TableActionResponseDto     {
         const table = this.tables.find((table: any) => table.id === parseInt(id));
         
         if (!table) {
@@ -140,7 +140,7 @@ export class TablesService {
         };
     }
 
-    startGame(id: string): TableActionResponse {
+    startGame(id: string): TableActionResponseDto {
         const table = this.tables.find((table: any) => table.id === parseInt(id));
         
         if (!table) {

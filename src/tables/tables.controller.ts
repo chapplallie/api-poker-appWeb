@@ -1,6 +1,6 @@
 import { Controller, Get, Param, Post, Body, BadRequestException } from '@nestjs/common';
 import { TablesService } from './tables.service';
-import { TableActionResponse } from './dto/tables.dto';
+import { TableActionResponseDto } from './dto/tables.dto';
 import { Public } from '../auth/decorators/public';
 
 @Public()
@@ -19,7 +19,7 @@ export class TablesController {
     }
 
     @Post(':id')
-    joinOrLeaveTable(@Param('id') id: string, @Body() body: { action: string, playerId?: number }): TableActionResponse {
+    joinOrLeaveTable(@Param('id') id: string, @Body() body: { action: string, playerId?: number }): TableActionResponseDto {
         if (!body.playerId) {
             throw new BadRequestException('playerId is required');
         }
@@ -32,7 +32,7 @@ export class TablesController {
     }
 
     @Post(':id/start')
-    startGame(@Param('id') id: string): TableActionResponse {
+    startGame(@Param('id') id: string): TableActionResponseDto {
         return this.tablesService.startGame(id);
     }
 }
