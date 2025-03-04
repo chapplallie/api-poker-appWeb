@@ -1,6 +1,5 @@
 import { Inject, Injectable, forwardRef } from '@nestjs/common';
 import { TableDto, TableJoinResponseDto, TableActionResponseDto } from './dto/tables.dto';
-import { Player } from '../players/entities/players.entities';
 import { GameLogicService } from '../game-logic/game-logic.service';
 
 @Injectable()
@@ -151,10 +150,12 @@ export class TablesService {
         }
         
         if (table.players.length < table.minPlayers) {
-            return {
-                success: false,
-                error: `Not enough players. Minimum ${table.minPlayers} required.`
-            };
+            this.addAIPlayers(table, table.minPlayers - table.players.length);
+        } else {
+            const aiPlayersToAdd = table.maxPlayers - table.players.length;
+            if (aiPlayersToAdd > 0) {
+                this.addAIPlayers(table, aiPlayersToAdd);
+            }
         }
         
         if (table.status === 'Ongoing') {
@@ -172,6 +173,35 @@ export class TablesService {
             success: true,
             table: gameState.table
         };
+    }
+
+    private addAIPlayers(table: TableDto, count: number): void {
+        const maxPlayerId = Math.max(
+            ...table.players.map(player => player.id),
+            1000
+        );
+        
+        for (let i = 0; i < count; i++) {
+            const aiPlayerId = maxPlayerId + i + 1;
+            table.players.push({
+                id: aiPlayerId,
+                name: `AI Player ${i + 1}`,
+                chips: 1000,
+                hand: [],
+                position: 0,
+                hasFolded: false,
+                hasPlayed: false,
+                isAllIn: false,
+                currentBet: 0,
+                isDealer: false,
+                isSmallBlind: false,
+                isBigBlind: false,
+                isActive: true,
+                isAI: true,
+                isCurrentPlayer: false,
+                isHuman: false
+            });
+        }
     }
 
 }
