@@ -29,7 +29,6 @@ export class GameLogicService {
     }
 
     evaluateGameState(table: any): any {
-        console.log(table);
         if (this.isRoundComplete(table)) {
             return this.evaluateEndRound(table);
         }
@@ -40,7 +39,7 @@ export class GameLogicService {
 
         const currentPlayer = this.getCurrentPlayer(table);
         
-        if (currentPlayer.isAI) {
+        if (currentPlayer.isAI && !currentPlayer.hasFolded) {
             const action = this.getAIAction(currentPlayer, table);
             console.log('AI player play', action);
             this.actionsService.executeAction(currentPlayer, action.type, table, action.amount);
@@ -48,14 +47,17 @@ export class GameLogicService {
             return this.evaluateGameState(table);
         }
 
-        if (currentPlayer.isHuman) {
+        if (currentPlayer.isHuman && !currentPlayer.hasFolded) {
+            console.log('Human player play');
             const possibleActions = this.actionsService.getPossibleActions(currentPlayer, table);
+            this.actionsService.executeAction(currentPlayer, "fold", table, 0);
             this.moveToNextPlayer(table);
-            return {
-                table,
-                currentPlayer,
-                possibleActions
-            };
+            return this.evaluateGameState(table);
+            // return {
+            //     table,
+            //     currentPlayer,
+            //     possibleActions
+            // };
         }
     }
 
