@@ -11,6 +11,7 @@ import {
   } from '@nestjs/common';
   import { AuthGuard } from './auth.guard';
   import { AuthService } from './auth.service';
+import { Public } from './decorators/public';
   
   @Controller('auth')
   export class AuthController {
@@ -18,7 +19,7 @@ import {
   
     @HttpCode(HttpStatus.OK)
     @Post('login')
-    signIn(@Body() signInDto: Record<string, any>) {
+    async signIn(@Body() signInDto: Record<string, any>) {
       return this.authService.signIn(signInDto.pseudo, signInDto.password);
     }
   
@@ -26,6 +27,12 @@ import {
     @Get('profile')
     getProfile(@Request() req: any) { //changer ANY 
       return req.user; 
+    }
+
+    @Public()
+    @Post('verify-token')
+    verifyToken(@Body() body: { token: string }) {
+      return this.authService.verifyToken(body.token);
     }
   }
   
