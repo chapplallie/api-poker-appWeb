@@ -156,7 +156,7 @@ export class TablesService {
                 error: 'Player must join the table before starting the game'
             };
         }
-    
+        
         const aiPlayersToAdd = table.maxPlayers - table.players.length;
         if (aiPlayersToAdd > 0) {
             this.addAIPlayers(table, aiPlayersToAdd);

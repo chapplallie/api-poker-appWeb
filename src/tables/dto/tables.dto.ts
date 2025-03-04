@@ -34,6 +34,8 @@ export class TableJoinResponseDto {
 
 export class TableActionResponseDto {
   success: boolean;
-  table?: TableDto;
   error?: string;
+  table?: TableDto;
+  currentPlayer?: any;
+  possibleActions?: any;
 } 
