@@ -139,7 +139,7 @@ export class TablesService {
         };
     }
 
-    startGame(id: string): TableActionResponseDto {
+    startGame(id: string, playerId: number): TableActionResponseDto {
         const table = this.tables.find((table: any) => table.id === parseInt(id));
         
         if (!table) {
@@ -149,13 +149,17 @@ export class TablesService {
             };
         }
         
-        if (table.players.length < table.minPlayers) {
-            this.addAIPlayers(table, table.minPlayers - table.players.length);
-        } else {
-            const aiPlayersToAdd = table.maxPlayers - table.players.length;
-            if (aiPlayersToAdd > 0) {
-                this.addAIPlayers(table, aiPlayersToAdd);
-            }
+        const playerExists = table.players.some(player => player.id === playerId);
+        if (!playerExists) {
+            return {
+                success: false,
+                error: 'Player must join the table before starting the game'
+            };
+        }
+    
+        const aiPlayersToAdd = table.maxPlayers - table.players.length;
+        if (aiPlayersToAdd > 0) {
+            this.addAIPlayers(table, aiPlayersToAdd);
         }
         
         if (table.status === 'Ongoing') {
