@@ -1,12 +1,12 @@
 import { Player } from '../../players/entities/players.entities';
 
-export interface Card {
+export class CardDto {
   suit: string;
   value: string;
   rank: number;
 }
 
-export interface Table {
+export class TableDto {
   id: number;
   name: string;
   status: 'Waiting' | 'Ongoing' | 'Finished';
@@ -18,22 +18,22 @@ export interface Table {
   currentBet: number;
   pot: number;
   dealerPosition: number;
-  river: Card[];
+  river: CardDto[];
   players: Player[];
   maxPlayers: number;
   minPlayers: number;
   lastWinner?: number;
-  winningHand?: Card[];
+  winningHand?: CardDto[];
 }
 
-export interface TableJoinResponse {
+export class TableJoinResponseDto {
   success: boolean;
-  table?: Table;
+  table?: TableDto;
   error?: string;
 }
 
-export interface TableActionResponse {
+export class TableActionResponseDto {
   success: boolean;
-  table?: Table;
+  table?: TableDto;
   error?: string;
 } 

@@ -3,7 +3,7 @@ import { ActionDto, ActionRequestDto, ActionResponseDto } from './dto/action.dto
 import { PlayersService } from '../players/players.service';
 import { TablesService } from '../tables/tables.service';
 import { Player } from '../players/entities/players.entities';
-import { Table } from '../tables/interfaces/tables.interface';
+import { TableDto } from '../tables/dto/tables.dto';
 
 @Injectable()
 export class ActionsService {
@@ -84,7 +84,7 @@ export class ActionsService {
         }
     }
 
-    getPossibleActions(player: Player, table: Table): string[] {
+    getPossibleActions(player: Player, table: TableDto): string[] {
         const possibleActions: string[] = [];
         
         if (!player.isCurrentPlayer || player.hasFolded) {
@@ -145,7 +145,7 @@ export class ActionsService {
         return { id: playerId } as Player;
     }
 
-    private getPlayerTable(playerId: number): Table {
-        return {} as Table;
+    private getPlayerTable(playerId: number): TableDto {
+        return {} as TableDto;
     }
 }

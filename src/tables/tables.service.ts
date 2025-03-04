@@ -1,5 +1,5 @@
 import { Inject, Injectable, forwardRef } from '@nestjs/common';
-import { Table, TableJoinResponse, TableActionResponse } from './interfaces/tables.interface';
+import { Table, TableJoinResponse, TableActionResponse } from './dto/tables.dto';
 import { Player } from '../players/entities/players.entities';
 import { GameLogicService } from '../game-logic/game-logic.service';
 

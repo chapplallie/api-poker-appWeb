@@ -1,6 +1,6 @@
 import { Controller, Get, Param, Post, Body, BadRequestException } from '@nestjs/common';
 import { TablesService } from './tables.service';
-import { TableActionResponse } from './interfaces/tables.interface';
+import { TableActionResponse } from './dto/tables.dto';
 import { Public } from '../auth/decorators/public';
 
 @Public()
