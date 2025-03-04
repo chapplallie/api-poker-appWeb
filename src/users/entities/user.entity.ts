@@ -9,17 +9,19 @@ export class User{
     @Column()
     pseudo: string;
 
-    // @Column()
-    // bank: number;
-
+    @Column({ unique: true })
+    email: string;
 
     @Column()
     password: string;
 
-    
-    @Column() //{unique:true}
-    
-    email: string;
+    @Column({ default: 1000 }) 
+    @Min(0)
+    bank: number;
+
+    @Column({ default: 0 })
+    @Min(0) 
+    victoryStats: number;
 
       
 //pour ajouter victory table => suppr db.sqlite + npm install @nestjs/typeorm typeorm sqlite3
