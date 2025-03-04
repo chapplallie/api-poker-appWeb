@@ -4,15 +4,14 @@ import { TableDto } from 'src/tables/dto/tables.dto';
 
 @Injectable()
 export class PlayersService {
-    placeBet(player: Player, bet: number): any {
+    placeBet(player: Player, bet: number): void {
         // Vérifie si le joueur a assez d'argent
-        if(bet > player.chips){
-            this.fold(player);
-            return "vous etes trop pauvre pour parier";
-
+        if(player.chips < bet){
+            //this.fold(player);
+            throw new Error("vous etes trop pauvre pour parier");
         } 
         player.chips -= bet;
-        return player.chips;
+        player.currentBet+= bet;
     }
 
     fold(player: Player): void {
@@ -26,23 +25,42 @@ export class PlayersService {
             throw new Error("votre mise n'est pas egale a la mise la plus haute de la table")
         }
         // Enregistre l'action
-        
+        player.hasPlayed = true;
     }
 
-    call(player: Player, amount: number): void {
+    call(player: Player, table: TableDto): void {
         // Vérifie si le call est possible
-        // Appelle placeBet avec le montant nécessaire
-        this.placeBet(player, amount);
+        if(player.currentBet == table.currentBet){
+            throw new Error("votre mise est déjà egale a la mise la plus haute de la table")
+        }
+
+        let call = table.currentBet - player.currentBet;
+        if(call <= 0){
+            throw new Error("votre mise est plus haute que le currentBet de la table")
+        }
+        table.pot += call;
+        this.placeBet(player, call);
     }
 
-    raise(player: Player, amount: number): void {
-        // Vérifie si le raise est possible
-        // Appelle placeBet avec le nouveau montant
-        this.placeBet(player, amount);
+    raise(player: Player, raise: number , table: TableDto): number {
+        this.placeBet(player, raise);
+        table.pot += raise;
+        return table.currentBet+= raise;
+    }
+
+    IsAllIn(player: Player, table: TableDto): boolean{
+        if(player.chips <= 0){
+            throw new Error("sans chips vous ne pouvez pas faire tapis")
+        }
+        table.currentBet+= player.chips;
+        table.pot += player.chips;
+        this.placeBet(player, player.chips);
+        return player.isAllIn = true;
     }
 
     showCards(player: Player): any {
         // Retourne les cartes du joueur
         return player.hand;
     }
+
 }

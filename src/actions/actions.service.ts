@@ -75,10 +75,10 @@ export class ActionsService {
                 this.playersService.check(player, table);
                 break;
             case 'call':
-                this.playersService.call(player, amount || 0);
+                this.playersService.call(player, table);
                 break;
             case 'raise':
-                this.playersService.raise(player, amount || 0);
+                this.playersService.raise(player, amount || 0, table);
                 break;
             default:
                 throw new Error(`Action non reconnue: ${action}`);
