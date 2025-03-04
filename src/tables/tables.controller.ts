@@ -34,7 +34,10 @@ export class TablesController {
     }
 
     @Post(':id/start')
-    startGame(@Param('id') id: string): TableActionResponseDto {
-        return this.tablesService.startGame(id);
+    startGame(@Param('id') id: string, @Body() body: { playerId: number }): TableActionResponseDto {
+        if (!body.playerId) {
+            throw new BadRequestException('playerId is required');
+        }
+        return this.tablesService.startGame(id, body.playerId);
     }
 }
