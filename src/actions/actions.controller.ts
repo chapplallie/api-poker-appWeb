@@ -1,13 +1,13 @@
 import { Controller, Get, Post, Body, Param, Query, Injectable } from '@nestjs/common';
 import { ActionsService } from './actions.service';
-import { Action, ActionRequest, ActionResponse } from './action.interface';
+import { ActionDto, ActionRequestDto, ActionResponseDto } from './dto/action.dto';
 
 @Controller('actions')
 export class ActionsController {
     constructor(private readonly actionsService: ActionsService) {}
 
     @Get()
-    getActions(): Action[] {
+    getActions(): ActionDto[] {
         return this.actionsService.getActions();
     }
 
@@ -15,7 +15,7 @@ export class ActionsController {
     getAvailableActions(
         @Query('playerId') playerId: string,
         @Query('tableId') tableId: string
-    ): Action[] {
+    ): ActionDto[] {
         return this.actionsService.getAvailableActions(
             parseInt(playerId, 10),
             parseInt(tableId, 10)
@@ -23,7 +23,7 @@ export class ActionsController {
     }
 
     @Post()
-    makeAction(@Body() actionRequest: ActionRequest): ActionResponse {
+    makeAction(@Body() actionRequest: ActionRequestDto): ActionResponseDto {
         return this.actionsService.makeAction(actionRequest);
     }
 }

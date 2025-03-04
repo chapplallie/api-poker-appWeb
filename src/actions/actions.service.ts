@@ -1,5 +1,5 @@
 import { Inject, Injectable, forwardRef } from '@nestjs/common';
-import { Action, ActionRequest, ActionResponse } from './action.interface';
+import { ActionDto, ActionRequestDto, ActionResponseDto } from './dto/action.dto';
 import { PlayersService } from '../players/players.service';
 import { TablesService } from '../tables/tables.service';
 import { Player } from '../players/entities/players.entities';
@@ -7,7 +7,7 @@ import { Table } from '../tables/interfaces/tables.interface';
 
 @Injectable()
 export class ActionsService {
-    private actions: Action[] = [
+    private actions: ActionDto[] = [
         { name: 'fold', description: 'Abandonner la main' },
         { name: 'check', description: 'Passer son tour' },
         { name: 'call', description: 'Suivre la mise' },
@@ -20,11 +20,11 @@ export class ActionsService {
         private readonly tablesService: TablesService
     ) {}
 
-    getActions(): Action[] {
+    getActions(): ActionDto[] {
         return this.actions;
     }
 
-    getAvailableActions(playerId: number, tableId: number): Action[] {
+    getAvailableActions(playerId: number, tableId: number): ActionDto[] {
         const table = this.tablesService.getTableById(tableId.toString());
         const player = table?.players.find((p: Player) => p.id === playerId);
         
@@ -41,7 +41,7 @@ export class ActionsService {
             }));
     }
 
-    makeAction(actionRequest: ActionRequest): ActionResponse {
+    makeAction(actionRequest: ActionRequestDto): ActionResponseDto {
         const { name, playerId, amount } = actionRequest;
         const selectedAction = this.actions.find(a => a.name === name);
         
