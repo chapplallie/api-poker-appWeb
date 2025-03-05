@@ -18,6 +18,8 @@ export class PlayersService {
     fold(player: Player): void {
         // Met le statut hasFolded du joueur à true
         player.hasFolded = true;
+        // Marque le joueur comme ayant joué son tour
+        player.hasPlayed = true;
     }
 
     check(player: Player, table: TableDto): void {
@@ -39,13 +41,16 @@ export class PlayersService {
         if(call <= 0){
             throw new Error("votre mise est plus haute que le currentBet de la table")
         }
-        table.pot += call;
         this.placeBet(player, call, table);
+        player.hasPlayed = true;
     }
 
     raise(player: Player, raise: number , table: TableDto): number {
         this.placeBet(player, raise, table);
         table.pot += raise;
+        // Marque le joueur comme ayant joué son tour
+        player.hasPlayed = true;
+        // Met à jour le currentBet de la table et le retourne
         return table.currentBet+= raise;
     }
 
@@ -56,6 +61,8 @@ export class PlayersService {
         table.currentBet+= player.chips;
         table.pot += player.chips;
         this.placeBet(player, player.chips, table);
+        // Marque le joueur comme ayant joué son tour
+        player.hasPlayed = true;
         return player.isAllIn = true;
     }
 

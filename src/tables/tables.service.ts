@@ -213,7 +213,7 @@ export class TablesService {
         }
     }
 
-    performAction(id: string, playerId: number, action: string, amount?: number):TableActionResponseDto {
+    performAction(id: string, playerId: number, action: string, amount?: number): TableActionResponseDto {
         const table = this.tables.find((table: any) => table.id === parseInt(id));
         
         if (!table) {
@@ -231,12 +231,20 @@ export class TablesService {
                 error: 'Player not found'
             };
         }
+        
+        this.gameLogicService.executeAction(player, action, table, amount);
+        
+        const gameState = this.gameLogicService.evaluateGameState(table);
 
-        // this.actionsService.executeAction(player, action, table, amount);
-
+        if (gameState && gameState.error) {
+            return {
+                success: false,
+                error: gameState.error
+            };
+        }
         return {
             success: true,
-            table
+            ...gameState
         };
     }
 

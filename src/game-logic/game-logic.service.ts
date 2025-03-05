@@ -29,6 +29,12 @@ export class GameLogicService {
     }
 
     evaluateGameState(table: any): any {
+        const currentPlayer = this.getCurrentPlayer(table);
+        if (currentPlayer && currentPlayer.hasFolded) {
+            this.moveToNextPlayer(table);
+            return this.evaluateGameState(table);
+        }
+
         if (this.isRoundComplete(table)) {
             return this.evaluateEndRound(table);
         }
@@ -36,20 +42,20 @@ export class GameLogicService {
         if (this.isTurnComplete(table)) {
             return this.evaluateEndTurn(table);
         }
-
-        const currentPlayer = this.getCurrentPlayer(table);
         
         if (currentPlayer.isAI && !currentPlayer.hasFolded) {
             const action = this.getAIAction(currentPlayer, table);
             console.log('AI player play', action);
             this.actionsService.executeAction(currentPlayer, action.type, table, action.amount);
+            currentPlayer.hasPlayed = true;
             this.moveToNextPlayer(table);
             return this.evaluateGameState(table);
         }
 
         if (currentPlayer.isHuman && !currentPlayer.hasFolded) {
+            console.log('Human have to play ?');
             const possibleActions = this.actionsService.getPossibleActions(currentPlayer, table);
-            this.moveToNextPlayer(table);
+            console.log('possibleActions', possibleActions);
             return {
                 table,
                 currentPlayer,
@@ -76,13 +82,15 @@ export class GameLogicService {
 
     private isTurnComplete(table: any): boolean {
         const activePlayers = table.players.filter((p: any) => !p.hasFolded);
-        const isComplete = activePlayers.every((p: any) => p.currentBet === table.currentBet);
         
-        if (isComplete) {
-            table.currentBet = table.bigBlind;
-        }
+        if (activePlayers.length <= 1) {
+            return true;
+        }   
         
-        return isComplete;
+        const allPlayersHavePlayed = activePlayers.every((p: any) => p.hasPlayed);
+        const allBetsEqual = activePlayers.every((p: any) => p.currentBet === table.currentBet);
+        
+        return allPlayersHavePlayed && allBetsEqual;
     }
 
     private getCurrentPlayer(table: any): any {
@@ -166,7 +174,11 @@ export class GameLogicService {
         if (randomActionType === 'raise') {
             const minRaise = table.currentBet + table.currentBlind;
             const maxRaise = Math.min(player.bank, table.currentBet * 3);
-            amount = Math.floor(Math.random() * (maxRaise - minRaise + 1)) + minRaise;
+            if (maxRaise >= minRaise) {
+                amount = Math.floor(Math.random() * (maxRaise - minRaise + 1)) + minRaise;
+            } else {
+                amount = minRaise;
+            }
         } else if (randomActionType === 'call') {
             amount = table.currentBet - player.currentBet;
         }
@@ -285,15 +297,33 @@ export class GameLogicService {
         
         currentPlayer.isCurrentPlayer = false;
         
-        const nextPlayerPos = (currentPlayer.position + 1) % table.players.length;
+        let nextPlayerPos = (currentPlayer.position + 1) % table.players.length;
+        
+        while (table.players[nextPlayerPos].hasFolded) {
+            nextPlayerPos = (nextPlayerPos + 1) % table.players.length;
+            if (nextPlayerPos === currentPlayer.position) {
+                break;
+            }
+        }
         
         table.players[nextPlayerPos].isCurrentPlayer = true;
     }
 
     executeAction(player: any, action: string, table: any, amount?: number): void {
         this.actionsService.executeAction(player, action, table, amount);
-        console.log(table);
-        this.evaluateGameState(table);
+        player.hasPlayed = true;
+        
+        if (action === 'raise') {
+            table.players.forEach((p: any) => {
+                if (p.id !== player.id && !p.hasFolded) {
+                    p.hasPlayed = false;
+                }
+            });
+        }
+        
+        this.moveToNextPlayer(table);
+        const gameState = this.evaluateGameState(table);
+        return gameState;
     }
 
 }

@@ -87,7 +87,6 @@ export class ActionsService {
         if (player.chips >= (currentBet - playerBet + minRaise)) {
             possibleActions.push('raise');
         }
-        console.log('possibleActions', possibleActions);
         return possibleActions;
     }
 }
