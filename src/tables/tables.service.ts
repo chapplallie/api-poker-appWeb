@@ -1,6 +1,7 @@
 import { Inject, Injectable, forwardRef } from '@nestjs/common';
 import { TableDto, TableJoinResponseDto, TableActionResponseDto } from './dto/tables.dto';
 import { GameLogicService } from '../game-logic/game-logic.service';
+import { ActionsService } from '../actions/actions.service';
 
 @Injectable()
 export class TablesService {
@@ -18,7 +19,7 @@ export class TablesService {
         dealerPosition: 0,
         river: [],
         players: [],
-        maxPlayers: 6,
+        maxPlayers: 4,
         minPlayers: 2
     },
     {
@@ -35,7 +36,7 @@ export class TablesService {
         dealerPosition: 0,
         river: [],
         players: [],
-        maxPlayers: 8,
+        maxPlayers: 4,
         minPlayers: 2
     },
     {
@@ -52,13 +53,13 @@ export class TablesService {
         dealerPosition: 0,
         river: [],
         players: [],
-        maxPlayers: 10,
+        maxPlayers: 4,
         minPlayers: 2
     }];
 
     constructor(
         @Inject(forwardRef(() => GameLogicService))
-        private readonly gameLogicService: GameLogicService
+        private readonly gameLogicService: GameLogicService,
     ) {}
 
     getTables(): any {
@@ -176,7 +177,9 @@ export class TablesService {
         
         return {
             success: true,
-            table: gameState.table
+            // table: gameState.table,
+            currentPlayer: gameState.currentPlayer,
+            possibleActions: gameState.possibleActions
         };
     }
 
@@ -208,6 +211,33 @@ export class TablesService {
                 isHuman: false
             });
         }
+    }
+
+    performAction(id: string, playerId: number, action: string, amount?: number):TableActionResponseDto {
+        const table = this.tables.find((table: any) => table.id === parseInt(id));
+        
+        if (!table) {
+            return {
+                success: false,
+                error: 'Table not found'
+            };
+        }
+
+        const player = table.players.find((player: any) => player.id === playerId);
+        
+        if (!player) {
+            return {
+                success: false,
+                error: 'Player not found'
+            };
+        }
+
+        // this.actionsService.executeAction(player, action, table, amount);
+
+        return {
+            success: true,
+            table
+        };
     }
 
 }

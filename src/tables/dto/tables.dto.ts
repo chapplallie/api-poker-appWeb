@@ -28,8 +28,10 @@ export class TableDto {
 
 export class TableJoinResponseDto {
   success: boolean;
-  table?: TableDto;
   error?: string;
+  table?: TableDto;
+  currentPlayer?: any;
+  possibleActions?: any;
 }
 
 export class TableActionResponseDto {

@@ -48,16 +48,13 @@ export class GameLogicService {
         }
 
         if (currentPlayer.isHuman && !currentPlayer.hasFolded) {
-            console.log('Human player play');
             const possibleActions = this.actionsService.getPossibleActions(currentPlayer, table);
-            this.actionsService.executeAction(currentPlayer, "fold", table, 0);
             this.moveToNextPlayer(table);
-            return this.evaluateGameState(table);
-            // return {
-            //     table,
-            //     currentPlayer,
-            //     possibleActions
-            // };
+            return {
+                table,
+                currentPlayer,
+                possibleActions
+            };
         }
     }
 
@@ -101,7 +98,7 @@ export class GameLogicService {
             table.lastWinner = winner.id;
             table.winningHand = null;
         } else {
-            const winner = this.determineWinner(activePlayers, table.river);
+            const winner = this.determineWinner(activePlayers);
             winner.bank += table.pot;
             table.lastWinner = winner.id;
             table.winningHand = winner.hand;
@@ -111,7 +108,7 @@ export class GameLogicService {
         table.round += 1;
         table.turn = 1;
         table.river = [];
-        table.currentBet = 0;
+        table.currentBet = table.bigBlind;
         
         table.players.forEach((player: any) => {
             player.cards = [];
@@ -124,7 +121,7 @@ export class GameLogicService {
         const humanPlayers = table.players.filter((p: any) => !p.isAI);
         const aiPlayers = table.players.filter((p: any) => p.isAI);
         
-        if (humanPlayers.length === 0 || aiPlayers.length === 0 || table.players.length < 2) {
+        if (humanPlayers.length === 0 || aiPlayers.length === 0 || table.players.length < 3) {
             return {
                 table,
                 gameOver: true,
@@ -177,7 +174,7 @@ export class GameLogicService {
         return { type: randomActionType, amount };
     }
 
-    private determineWinner(players: any[], river: any[]): any {
+    private determineWinner(players: any[]): any {
         const randomIndex = Math.floor(Math.random() * players.length);
         return players[randomIndex];
     }
@@ -204,8 +201,8 @@ export class GameLogicService {
         table.players[smallBlindPos].isSmallBlind = true;
         table.players[bigBlindPos].isBigBlind = true;
         
-        this.playersService.placeBet(table.players[smallBlindPos], table.currentBlind);
-        this.playersService.placeBet(table.players[bigBlindPos], table.currentBlind * 2);
+        this.playersService.placeBet(table.players[smallBlindPos], table.currentBlind, table);
+        this.playersService.placeBet(table.players[bigBlindPos], table.currentBlind * 2, table);
         table.currentBet = table.currentBlind * 2;
         
         const nextPlayerPos = (bigBlindPos + 1) % table.players.length;
@@ -253,8 +250,8 @@ export class GameLogicService {
         const nextPlayerPos = (bigBlindPos + 1) % table.players.length;
         table.players[nextPlayerPos].isCurrentPlayer = true;
         
-        this.playersService.placeBet(table.players[smallBlindPos], table.currentBlind);
-        this.playersService.placeBet(table.players[bigBlindPos], table.currentBlind * 2);
+        this.playersService.placeBet(table.players[smallBlindPos], table.currentBlind, table);
+        this.playersService.placeBet(table.players[bigBlindPos], table.currentBlind * 2, table);
     }
 
     rotateRole(table: any): void {
@@ -291,6 +288,12 @@ export class GameLogicService {
         const nextPlayerPos = (currentPlayer.position + 1) % table.players.length;
         
         table.players[nextPlayerPos].isCurrentPlayer = true;
+    }
+
+    executeAction(player: any, action: string, table: any, amount?: number): void {
+        this.actionsService.executeAction(player, action, table, amount);
+        console.log(table);
+        this.evaluateGameState(table);
     }
 
 }

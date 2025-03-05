@@ -18,7 +18,7 @@ export class ActionsService {
     constructor(
         private readonly playersService: PlayersService,
         @Inject(forwardRef(() => TablesService))
-        private readonly tablesService: TablesService
+        private readonly tablesService: TablesService,
     ) {}
 
     getActions(): ActionDto[] {
@@ -42,29 +42,29 @@ export class ActionsService {
             }));
     }
 
-    makeAction(actionRequest: ActionRequestDto): ActionResponseDto {
-        const { name, playerId, amount } = actionRequest;
-        const selectedAction = this.actions.find(a => a.name === name);
+    // makeAction(actionRequest: ActionRequestDto): ActionResponseDto {
+    //     const { name, playerId, amount } = actionRequest;
+    //     const selectedAction = this.actions.find(a => a.name === name);
         
-        if (!selectedAction) {
-            return { success: false, message: 'Action invalide' };
-        }
+    //     if (!selectedAction) {
+    //         return { success: false, message: 'Action invalide' };
+    //     }
 
-        const player = this.getPlayer(playerId);
-        const table = this.getPlayerTable(playerId);
+    //     const player = this.getPlayer(playerId);
+    //     const table = this.getPlayerTable(playerId);
         
-        if (!this.validateAction(player, name, amount)) {
-            return { success: false, message: `Impossible d'effectuer l'action '${name}'` };
-        }
+    //     if (!this.validateAction(player, name, amount)) {
+    //         return { success: false, message: `Impossible d'effectuer l'action '${name}'` };
+    //     }
 
-        this.executeAction(player, name, table, amount);
+    //     this.executeAction(player, name, table, amount);
 
-        return {
-            success: true,
-            message: `Action '${name}' effectuée avec succès`,
-            action: selectedAction
-        };
-    }
+    //     return {
+    //         success: true,
+    //         message: `Action '${name}' effectuée avec succès`,
+    //         action: selectedAction
+    //     };
+    // }
 
     executeAction(player: Player, action: string, table: TableDto, amount?: number): void {
         switch (action) {

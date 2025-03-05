@@ -4,7 +4,7 @@ import { TableDto } from 'src/tables/dto/tables.dto';
 
 @Injectable()
 export class PlayersService {
-    placeBet(player: Player, bet: number): void {
+    placeBet(player: Player, bet: number, table: TableDto): void {
         // Vérifie si le joueur a assez d'argent
         if(player.chips < bet){
             //this.fold(player);
@@ -12,6 +12,7 @@ export class PlayersService {
         } 
         player.chips -= bet;
         player.currentBet+= bet;
+        table.pot += bet;
     }
 
     fold(player: Player): void {
@@ -39,11 +40,11 @@ export class PlayersService {
             throw new Error("votre mise est plus haute que le currentBet de la table")
         }
         table.pot += call;
-        this.placeBet(player, call);
+        this.placeBet(player, call, table);
     }
 
     raise(player: Player, raise: number , table: TableDto): number {
-        this.placeBet(player, raise);
+        this.placeBet(player, raise, table);
         table.pot += raise;
         return table.currentBet+= raise;
     }
@@ -54,7 +55,7 @@ export class PlayersService {
         }
         table.currentBet+= player.chips;
         table.pot += player.chips;
-        this.placeBet(player, player.chips);
+        this.placeBet(player, player.chips, table);
         return player.isAllIn = true;
     }
 

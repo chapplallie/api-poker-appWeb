@@ -40,4 +40,12 @@ export class TablesController {
         }
         return this.tablesService.startGame(id, body.playerId);
     }
+
+    @Post(':id/action')
+    performAction(@Param('id') id: string, @Body() body: { playerId: number, action: string, amount?: number }): TableActionResponseDto {
+        if (!body.playerId || !body.action) {
+            throw new BadRequestException('playerId and action are required');
+        }
+        return this.tablesService.performAction(id, body.playerId, body.action, body.amount);
+    }
 }
