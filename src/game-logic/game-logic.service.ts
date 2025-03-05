@@ -45,7 +45,7 @@ export class GameLogicService {
         
         if (currentPlayer.isAI && !currentPlayer.hasFolded) {
             const action = this.getAIAction(currentPlayer, table);
-            console.log('AI player play', action);
+            console.log('AI player' , currentPlayer.id, 'play', action);
             this.actionsService.executeAction(currentPlayer, action.type, table, action.amount);
             currentPlayer.hasPlayed = true;
             this.moveToNextPlayer(table);
@@ -67,7 +67,6 @@ export class GameLogicService {
     private isRoundComplete(table: any): boolean {
         const activePlayers = table.players.filter((p: any) => !p.hasFolded);
         if (activePlayers.length === 1) {
-            table.currentBet = table.bigBlind;
             return true;
         }
         
@@ -102,34 +101,22 @@ export class GameLogicService {
         
         if (activePlayers.length === 1) {
             const winner = activePlayers[0];
-            winner.bank += table.pot;
+            winner.chips += table.pot;
             table.lastWinner = winner.id;
             table.winningHand = null;
         } else {
             const winner = this.determineWinner(activePlayers);
-            winner.bank += table.pot;
+            winner.chips += table.pot;
             table.lastWinner = winner.id;
             table.winningHand = winner.hand;
         }
         
-        table.pot = 0;
-        table.round += 1;
-        table.turn = 1;
-        table.river = [];
-        table.currentBet = table.bigBlind;
-        
-        table.players.forEach((player: any) => {
-            player.cards = [];
-            player.hasFolded = false;
-            player.currentBet = 0;
-        });
-        
-        table.players = table.players.filter((player: any) => player.bank > 0);
+        table.players = table.players.filter((player: any) => player.chips > 0);
         
         const humanPlayers = table.players.filter((p: any) => !p.isAI);
         const aiPlayers = table.players.filter((p: any) => p.isAI);
         
-        if (humanPlayers.length === 0 || aiPlayers.length === 0 || table.players.length < 3) {
+        if (humanPlayers.length === 0 || aiPlayers.length === 0 || table.players.length < 2) {
             return {
                 table,
                 gameOver: true,
@@ -137,19 +124,22 @@ export class GameLogicService {
             };
         }
         
-        this.rotateDealer(table);
-        this.decksService.shuffle();
-        this.decksService.distribute(table.players);
+        this.startNextRound(table);
         
         return this.evaluateGameState(table);
     }
 
     private evaluateEndTurn(table: any): any {
+        console.log('End turn');
         table.turn += 1;
+        
+        table.currentBet = 0;
         
         table.players.forEach((player: any) => {
             if (!player.hasFolded) {
                 player.hasPlayed = false;
+                player.hasAlreadyRaise = false;
+                player.currentBet = 0;
             }
         });
         
@@ -213,29 +203,6 @@ export class GameLogicService {
         table.players[table.dealerPosition].isDealer = true;
         table.players[smallBlindPos].isSmallBlind = true;
         table.players[bigBlindPos].isBigBlind = true;
-        
-        const nextPlayerPos = (bigBlindPos + 1) % table.players.length;
-        table.players[nextPlayerPos].isCurrentPlayer = true;
-    }
-
-    private assignBlindPositions(table: any): void {
-        const smallBlindPos = (table.dealerPosition + 1) % table.players.length;
-        const bigBlindPos = (table.dealerPosition + 2) % table.players.length;
-        
-        table.players.forEach((p: any) => {
-            p.isDealer = false;
-            p.isSmallBlind = false;
-            p.isBigBlind = false;
-            p.isCurrentPlayer = false;
-        });
-        
-        table.players[table.dealerPosition].isDealer = true;
-        table.players[smallBlindPos].isSmallBlind = true;
-        table.players[bigBlindPos].isBigBlind = true;
-        
-        this.playersService.placeBet(table.players[smallBlindPos], table.currentBlind, table);
-        this.playersService.placeBet(table.players[bigBlindPos], table.currentBlind * 2, table);
-        table.currentBet = table.currentBlind * 2;
         
         const nextPlayerPos = (bigBlindPos + 1) % table.players.length;
         table.players[nextPlayerPos].isCurrentPlayer = true;
