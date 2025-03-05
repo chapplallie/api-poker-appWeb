@@ -1,5 +1,12 @@
 import { Player } from '../../players/entities/players.entities';
 
+export class GameLogEntry {
+  timestamp: Date;
+  type: 'action' | 'turn' | 'round' | 'cards' | 'pot';
+  message: string;
+  data?: any;
+}
+
 export class CardDto {
   suit: string;
   value: string;
@@ -24,6 +31,7 @@ export class TableDto {
   minPlayers: number;
   lastWinner?: number;
   winningHand?: CardDto[];
+  gameLog: GameLogEntry[];
 }
 
 export class TableJoinResponseDto {
