@@ -1,7 +1,6 @@
 import { Inject, Injectable, forwardRef } from '@nestjs/common';
 import { TableDto, TableJoinResponseDto, TableActionResponseDto } from './dto/tables.dto';
 import { GameLogicService } from '../game-logic/game-logic.service';
-import { ActionsService } from '../actions/actions.service';
 
 @Injectable()
 export class TablesService {
@@ -20,7 +19,8 @@ export class TablesService {
         river: [],
         players: [],
         maxPlayers: 4,
-        minPlayers: 2
+        minPlayers: 2,
+        gameLog: []
     },
     {
         id: 2,
@@ -37,7 +37,8 @@ export class TablesService {
         river: [],
         players: [],
         maxPlayers: 4,
-        minPlayers: 2
+        minPlayers: 2,
+        gameLog: []
     },
     {
         id: 3,
@@ -54,7 +55,8 @@ export class TablesService {
         river: [],
         players: [],
         maxPlayers: 4,
-        minPlayers: 2
+        minPlayers: 2,
+        gameLog: []
     }];
 
     constructor(

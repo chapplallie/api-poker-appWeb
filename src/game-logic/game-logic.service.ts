@@ -2,6 +2,7 @@ import { Inject, Injectable, forwardRef } from '@nestjs/common';
 import { DecksService } from '../decks/decks.service';
 import { PlayersService } from '../players/players.service';
 import { ActionsService } from '../actions/actions.service';
+import { GameLogEntry } from '../tables/dto/tables.dto';
 
 @Injectable()
 export class GameLogicService {
@@ -12,7 +13,28 @@ export class GameLogicService {
         private readonly actionsService: ActionsService,
     ) {}
 
+    // Méthode pour ajouter une entrée au journal de la table
+    private addLogEntry(table: any, type: 'action' | 'turn' | 'round' | 'cards' | 'pot', message: string, data?: any): void {
+        // Initialiser le journal s'il n'existe pas
+        if (!table.gameLog) {
+            table.gameLog = [];
+        }
+        
+        // Ajouter l'entrée
+        table.gameLog.push({
+            timestamp: new Date(),
+            type,
+            message,
+            data
+        });
+        
+        console.log(`[${type.toUpperCase()}] ${message}`);
+    }
+
     initializeGame(table: any): any {
+        table.gameLog = [];
+        this.addLogEntry(table, 'round', 'Game initialized');
+        
         table.pot = 0;
         this.assignPlayerPositions(table);
         this.assignFirstDealer(table);
@@ -25,6 +47,7 @@ export class GameLogicService {
         
         table.currentBet = table.bigBlind;
         
+        this.addLogEntry(table, 'round', `Round ${table.round} started`, { pot: table.pot });
         return this.evaluateGameState(table);
     }
 
@@ -104,11 +127,20 @@ export class GameLogicService {
             winner.chips += table.pot;
             table.lastWinner = winner.id;
             table.winningHand = null;
+            this.addLogEntry(table, 'round', `Round ${table.round} ended. ${winner.name} wins by default as last player standing`, { 
+                winner: winner.name, 
+                amount: table.pot 
+            });
         } else {
             const winner = this.determineWinner(activePlayers);
             winner.chips += table.pot;
             table.lastWinner = winner.id;
             table.winningHand = winner.hand;
+            this.addLogEntry(table, 'round', `Round ${table.round} ended. ${winner.name} wins with best hand`, { 
+                winner: winner.name, 
+                amount: table.pot, 
+                hand: winner.hand 
+            });
         }
         
         table.players = table.players.filter((player: any) => player.chips > 0);
@@ -117,6 +149,11 @@ export class GameLogicService {
         const aiPlayers = table.players.filter((p: any) => p.isAI);
         
         if (humanPlayers.length === 0 || aiPlayers.length === 0 || table.players.length < 2) {
+            this.addLogEntry(table, 'round', 'Game Over', { 
+                remainingPlayers: table.players.length,
+                remainingHumans: humanPlayers.length,
+                remainingAI: aiPlayers.length
+            });
             return {
                 table,
                 gameOver: true,
@@ -130,7 +167,7 @@ export class GameLogicService {
     }
 
     private evaluateEndTurn(table: any): any {
-        console.log('End turn');
+        this.addLogEntry(table, 'turn', `Turn ${table.turn} completed`);
         table.turn += 1;
         
         table.currentBet = 0;
@@ -164,7 +201,7 @@ export class GameLogicService {
         if (randomActionType === 'raise') {
             player.hasAlreadyRaise = true;
             const minRaise = table.currentBet + table.currentBlind;
-            const maxRaise = Math.min(player.bank, table.currentBet * 3);
+            const maxRaise = Math.min(player.chips, table.currentBet * 3);
             if (maxRaise >= minRaise) {
                 amount = Math.floor(Math.random() * (maxRaise - minRaise + 1)) + minRaise;
             } else {
@@ -173,6 +210,15 @@ export class GameLogicService {
         } else if (randomActionType === 'call') {
             amount = table.currentBet - player.currentBet;
         }
+        
+        this.addLogEntry(table, 'action', `AI player ${player.name} (${player.id}) chose to ${randomActionType}${amount ? ' with ' + amount : ''}`, {
+            playerId: player.id,
+            playerName: player.name,
+            isAI: true,
+            action: randomActionType,
+            amount: amount,
+            currentPot: table.pot
+        });
         
         return { type: randomActionType, amount };
     }
@@ -210,6 +256,10 @@ export class GameLogicService {
 
     turnTwo(table: any): any {
         table.river = this.decksService.dealFlop();
+        this.addLogEntry(table, 'cards', 'Flop cards dealt', { 
+            flop: table.river, 
+            currentPot: table.pot 
+        });
         this.rotateRole(table);
         return this.evaluateGameState(table);
     }
@@ -217,6 +267,11 @@ export class GameLogicService {
     turnThree(table: any): any {
         const turnCard = this.decksService.dealTurn();
         table.river.push(turnCard);
+        this.addLogEntry(table, 'cards', 'Turn card dealt', { 
+            turnCard: turnCard, 
+            river: table.river, 
+            currentPot: table.pot 
+        });
         this.rotateRole(table);
         return this.evaluateGameState(table);
     }
@@ -224,6 +279,11 @@ export class GameLogicService {
     turnFour(table: any): any {
         const riverCard = this.decksService.dealRiver();
         table.river.push(riverCard);
+        this.addLogEntry(table, 'cards', 'River card dealt', { 
+            riverCard: riverCard, 
+            river: table.river, 
+            currentPot: table.pot 
+        });
         this.rotateRole(table);
         return this.evaluateGameState(table);
     }
@@ -305,6 +365,15 @@ export class GameLogicService {
         this.actionsService.executeAction(player, action, table, amount);
         player.hasPlayed = true;
         
+        this.addLogEntry(table, 'action', `Player ${player.name} (${player.id}) ${action}${amount ? ' with ' + amount : ''}`, {
+            playerId: player.id,
+            playerName: player.name,
+            isAI: player.isAI,
+            action: action,
+            amount: amount,
+            currentPot: table.pot
+        });
+        
         if (action === 'raise') {
             table.players.forEach((p: any) => {
                 if (p.id !== player.id && !p.hasFolded) {
@@ -342,6 +411,17 @@ export class GameLogicService {
         
         this.decksService.shuffle();
         this.decksService.distribute(table.players);
+        
+        this.addLogEntry(table, 'round', `Round ${table.round} started`, { 
+            players: table.players.map((p: any) => ({
+                id: p.id,
+                name: p.name,
+                chips: p.chips,
+                isDealer: p.isDealer,
+                isSmallBlind: p.isSmallBlind,
+                isBigBlind: p.isBigBlind
+            }))
+        });
     }
 
 }
