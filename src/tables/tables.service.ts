@@ -104,7 +104,8 @@ export class TablesService {
             isActive: true,
             isAI: false,
             isCurrentPlayer: false,
-            isHuman: true
+            isHuman: true,
+            hasAlreadyRaise: false
         });
         
         return {
@@ -208,7 +209,8 @@ export class TablesService {
                 isActive: true,
                 isAI: true,
                 isCurrentPlayer: false,
-                isHuman: false
+                isHuman: false,
+                hasAlreadyRaise: false
             });
         }
     }

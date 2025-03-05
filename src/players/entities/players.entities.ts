@@ -16,7 +16,8 @@ export class Player {
   isAI: boolean;
   isCurrentPlayer: boolean;
   isHuman: boolean;
-
+  hasAlreadyRaise: boolean;
+  
   constructor(partial: Partial<Player>) {
     Object.assign(this, partial);
     this.hand = [];
@@ -31,6 +32,7 @@ export class Player {
     this.isAI = false;
     this.isCurrentPlayer = false;
     this.isHuman = false;
+    this.hasAlreadyRaise = false;
   }
 }
 

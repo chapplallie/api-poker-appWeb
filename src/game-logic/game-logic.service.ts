@@ -172,6 +172,7 @@ export class GameLogicService {
         
         let amount = 0;
         if (randomActionType === 'raise') {
+            player.hasAlreadyRaise = true;
             const minRaise = table.currentBet + table.currentBlind;
             const maxRaise = Math.min(player.bank, table.currentBet * 3);
             if (maxRaise >= minRaise) {
@@ -192,10 +193,29 @@ export class GameLogicService {
     }
 
     private rotateDealer(table: any): void {
-        let newDealerPos = (table.dealerPosition + 1) % table.players.length;
+        if (!table.players || table.players.length === 0) {
+            console.error('No players in the table');
+            return;
+        }
         
-        table.dealerPosition = newDealerPos;
-        this.assignBlindPositions(table);
+        table.dealerPosition = (table.dealerPosition + 1) % table.players.length;
+        
+        const smallBlindPos = (table.dealerPosition + 1) % table.players.length;
+        const bigBlindPos = (table.dealerPosition + 2) % table.players.length;
+        
+        table.players.forEach((p: any) => {
+            p.isDealer = false;
+            p.isSmallBlind = false;
+            p.isBigBlind = false;
+            p.isCurrentPlayer = false;
+        });
+        
+        table.players[table.dealerPosition].isDealer = true;
+        table.players[smallBlindPos].isSmallBlind = true;
+        table.players[bigBlindPos].isBigBlind = true;
+        
+        const nextPlayerPos = (bigBlindPos + 1) % table.players.length;
+        table.players[nextPlayerPos].isCurrentPlayer = true;
     }
 
     private assignBlindPositions(table: any): void {
@@ -267,6 +287,11 @@ export class GameLogicService {
     }
 
     rotateRole(table: any): void {
+        if (!table.players || table.players.length === 0) {
+            console.error('No players in the table');
+            return;
+        }
+        
         table.dealerPosition = (table.dealerPosition + 1) % table.players.length;
         
         const smallBlindPos = (table.dealerPosition + 1) % table.players.length;

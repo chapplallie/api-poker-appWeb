@@ -84,7 +84,7 @@ export class ActionsService {
         }
         
         const minRaise = table.currentBlind;
-        if (player.chips >= (currentBet - playerBet + minRaise)) {
+        if (player.chips >= (currentBet - playerBet + minRaise) && !player.hasAlreadyRaise) {
             possibleActions.push('raise');
         }
         return possibleActions;
