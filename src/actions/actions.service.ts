@@ -42,30 +42,6 @@ export class ActionsService {
             }));
     }
 
-    // makeAction(actionRequest: ActionRequestDto): ActionResponseDto {
-    //     const { name, playerId, amount } = actionRequest;
-    //     const selectedAction = this.actions.find(a => a.name === name);
-        
-    //     if (!selectedAction) {
-    //         return { success: false, message: 'Action invalide' };
-    //     }
-
-    //     const player = this.getPlayer(playerId);
-    //     const table = this.getPlayerTable(playerId);
-        
-    //     if (!this.validateAction(player, name, amount)) {
-    //         return { success: false, message: `Impossible d'effectuer l'action '${name}'` };
-    //     }
-
-    //     this.executeAction(player, name, table, amount);
-
-    //     return {
-    //         success: true,
-    //         message: `Action '${name}' effectuée avec succès`,
-    //         action: selectedAction
-    //     };
-    // }
-
     executeAction(player: Player, action: string, table: TableDto, amount?: number): void {
         switch (action) {
             case 'fold':
@@ -114,43 +90,5 @@ export class ActionsService {
         console.log('possibleActions', possibleActions);
         return possibleActions;
     }
-
-    validateAction(player: Player, action: string, amount?: number): boolean {
-        if (!player || !action) {
-            return false;
-        }
-        
-        if (player.hasFolded) {
-            return false;
-        }
-        
-        switch (action) {
-            case 'fold':
-                return true;
-                
-            case 'check':
-                return player.currentBet === player.currentBet;
-                
-            case 'call':
-                return player.chips >= (amount || 0);
-                
-            case 'raise':
-                return !!amount && player.chips >= amount;
-                
-            default:
-                return false;
-        }
-    }
-
-    private getPlayer(playerId: number): Player {
-        return { id: playerId } as Player;
-    }
-
-    private getPlayerTable(playerId: number): TableDto {
-        return {} as TableDto;
-    }
-}
-function getTableById() {
-    throw new Error('Function not implemented.');
 }
 
