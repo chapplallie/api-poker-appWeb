@@ -351,4 +351,30 @@ export class GameLogicService {
         return gameState;
     }
 
+    startNextRound(table: any): void {
+        table.round += 1;
+        
+        table.turn = 1;
+        table.currentBet = table.bigBlind;
+        table.pot = 0;
+        
+        table.river = [];
+        
+        table.players.forEach((player: any) => {
+            player.hand = [];
+            
+            player.currentBet = 0;
+            player.hasFolded = false;
+            player.hasPlayed = false;
+            player.isAllIn = false;
+            player.isActive = true;
+            player.hasAlreadyRaise = false;
+        });
+        
+        this.rotateDealer(table);
+        
+        this.decksService.shuffle();
+        this.decksService.distribute(table.players);
+    }
+
 }
