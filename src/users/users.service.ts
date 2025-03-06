@@ -40,8 +40,9 @@ export class UsersService {
     return await this.repo.find();
   }
 
-  async getUserById(id: string): Promise<User | null> {
-    return await this.repo.findOne({ where: { id: parseInt(id) } });
+  async getUserById(id: number): Promise<User | null> {
+    const user =  await this.repo.findOne({ where: { id: id }});
+    return user;
   }
 
   async create(userData: CreateUserDto): Promise<User> {
@@ -66,9 +67,9 @@ export class UsersService {
     }
   } 
 
-  async findOne(email: string): Promise<User | null> {
+  async findOne(pseudo: string): Promise<User | null> {
 
-    return this.repo.findOneBy({"email": email});
+    return this.repo.findOneBy({"pseudo": pseudo});
   }
 
 }
