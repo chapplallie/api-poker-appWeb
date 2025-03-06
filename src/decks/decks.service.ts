@@ -8,7 +8,7 @@ export class DecksService {
         this.initializeDeck();
     }
 
-    private initializeDeck(): void {
+    public initializeDeck(): void {
         // Crée un nouveau deck de 52 cartes
         const colors = ['Heart', 'Diamond', 'Clover', 'Spade'];
         const values = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A'];

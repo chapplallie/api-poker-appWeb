@@ -405,6 +405,7 @@ export class GameLogicService {
         
         this.rotateDealer(table);
         
+        this.decksService.initializeDeck();
         this.decksService.shuffle();
         this.decksService.distribute(table.players);
         
