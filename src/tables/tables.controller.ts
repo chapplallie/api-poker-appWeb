@@ -1,12 +1,18 @@
-import { Controller, Get, Param, Post, Body, BadRequestException } from '@nestjs/common';
+import { Controller, Get, Param, Post, Body, BadRequestException, Req, UseGuards } from '@nestjs/common';
 import { TablesService } from './tables.service';
 import { TableActionResponseDto } from './dto/tables.dto';
 import { Public } from '../auth/decorators/public';
-
+import { UsersService } from '../users/users.service'; 
+import { User } from 'src/users/entities/user.entity';
+import { GetUser } from '../auth/decorators/user.decorator';
 
 @Controller('tables')
 export class TablesController {
-    constructor(private readonly tablesService: TablesService) {}
+    
+    constructor(
+        private readonly tablesService: TablesService,
+        private readonly UsersService : UsersService
+    ) {}
 
     @Public()
     @Get()
@@ -20,32 +26,59 @@ export class TablesController {
         return this.tablesService.getTableById(id);
     }
 
+    @UseGuards()
     @Post(':id')
-    joinOrLeaveTable(@Param('id') id: string, @Body() body: { action: string, playerId?: number }): TableActionResponseDto {
-        if (!body.playerId) {
-            throw new BadRequestException('playerId is required');
+    async joinOrLeaveTable(
+
+        @GetUser('sub') userId: number,
+        @Param('id') id: string,
+        @Body() body: { action: string }
+
+    ): Promise<TableActionResponseDto>{
+        let user = await this.UsersService.getUserById(userId);
+
+        console.log("user : ", user);
+
+        if (!user) {
+            throw new BadRequestException('le user est undefined');
         }
+        
         if (body.action === 'join') {
-            return this.tablesService.joinTable(id, body.playerId);
+            return this.tablesService.joinTable(id, user);
         } else if (body.action === 'leave') {
-            return this.tablesService.leaveTable(id, body.playerId);
+            return this.tablesService.leaveTable(id, user);
         }
-        throw new BadRequestException('Invalid action. Must be "join" or "leave"');
+         throw new BadRequestException('Invalid action. Must be "join" or "leave"');
+    }
+    
+    @UseGuards()
+    @Post(':id/start')
+    startGame(
+        @GetUser()user: User,
+        @Param('id') id: string,
+    
+    ): TableActionResponseDto {
+
+        console.log(user);
+        if (!user) {
+            throw new BadRequestException('user is undefined');
+        }
+        return this.tablesService.startGame(id, user);
     }
 
-    @Post(':id/start')
-    startGame(@Param('id') id: string, @Body() body: { playerId: number }): TableActionResponseDto {
-        if (!body.playerId) {
+    @UseGuards()
+    @Post(':id/action')
+    performAction(
+        @Param('id') id: string,
+        @GetUser() user: User,
+        @Body() body: {action: string, amount?: number }
+    ): TableActionResponseDto {
+        if (!user) {
             throw new BadRequestException('playerId is required');
         }
-        return this.tablesService.startGame(id, body.playerId);
-    }
-
-    @Post(':id/action')
-    performAction(@Param('id') id: string, @Body() body: { playerId: number, action: string, amount?: number }): TableActionResponseDto {
-        if (!body.playerId || !body.action) {
-            throw new BadRequestException('playerId and action are required');
+        if (!body.action) {
+            throw new BadRequestException('Action is required');
         }
-        return this.tablesService.performAction(id, body.playerId, body.action, body.amount);
+        return this.tablesService.performAction(id, user, body.action, body.amount);
     }
 }

@@ -27,7 +27,7 @@ export class AuthService {
         throw new UnauthorizedException('password invalide');
     }
     
-    const payload = { username: user.pseudo, sub: user.id };
+    const payload = { pseudo: user.pseudo, id: user.id };
     return {
       access_token: await this.jwtService.signAsync(payload),
     };

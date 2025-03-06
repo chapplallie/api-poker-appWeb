@@ -15,7 +15,7 @@ export class UsersController {
   
   @Get(':id')
   //changer le any svp lol
-  getUserById(@Param('id') id: string): any {
+  getUserById(@Param('id') id: number): any {
     return this.usersService.getUserById(id);
   }
 

@@ -1,6 +1,7 @@
 import { Inject, Injectable, forwardRef } from '@nestjs/common';
 import { TableDto, TableJoinResponseDto, TableActionResponseDto } from './dto/tables.dto';
 import { GameLogicService } from '../game-logic/game-logic.service';
+import { User } from 'src/users/entities/user.entity';
 
 @Injectable()
 export class TablesService {
@@ -72,9 +73,9 @@ export class TablesService {
         return this.tables.find((table: any) => table.id === parseInt(id));
     }
 
-    joinTable(id: string, playerId: number): TableJoinResponseDto {
+    joinTable(id: string, user: User): TableJoinResponseDto {
         const table = this.tables.find((table: any) => table.id === parseInt(id));
-        
+
         if (!table) {
             return {
                 success: false,
@@ -82,7 +83,7 @@ export class TablesService {
             };
         }
         
-        if (table.players.some(player => player.id === playerId)) {
+        if (table.players.some(player => player.id === user.id)) {
             return {
                 success: false,
                 error: 'Player already joined this table'
@@ -90,9 +91,9 @@ export class TablesService {
         }
         
         table.players.push({
-            id: playerId,
-            name: "Player " + playerId,
-            chips: 1000,
+            id: user.id,
+            name: user.pseudo || "Player " + user.id,
+            chips: user.bank,
             hand: [],
             tableId: table.id,
             position: 0,
@@ -116,7 +117,7 @@ export class TablesService {
         };
     }
 
-    leaveTable(id: string, playerId: number): TableActionResponseDto     {
+    leaveTable(id: string, user: User): TableActionResponseDto     {
         const table = this.tables.find((table: any) => table.id === parseInt(id));
         
         if (!table) {
@@ -126,7 +127,7 @@ export class TablesService {
             };
         }
         
-        const playerExists = table.players.some(player => player.id === playerId);
+        const playerExists = table.players.some(player => player.id === user.id);
         if (!playerExists) {
             return {
                 success: false,
@@ -136,7 +137,7 @@ export class TablesService {
         
         // Logique pour sécuriser les gains dans users
         
-        table.players = table.players.filter((player: any) => player.id !== playerId);
+        table.players = table.players.filter((player: any) => player.id !== user.id);
         
         return {
             success: true,
@@ -144,7 +145,7 @@ export class TablesService {
         };
     }
 
-    startGame(id: string, playerId: number): TableActionResponseDto {
+    startGame(id: string, user: User): TableActionResponseDto {
         const table = this.tables.find((table: any) => table.id === parseInt(id));
         
         if (!table) {
@@ -154,7 +155,7 @@ export class TablesService {
             };
         }
         
-        const playerExists = table.players.some(player => player.id === playerId);
+        const playerExists = table.players.some(player => player.id === user.id);
         if (!playerExists) {
             return {
                 success: false,
@@ -217,7 +218,7 @@ export class TablesService {
         }
     }
 
-    performAction(id: string, playerId: number, action: string, amount?: number): TableActionResponseDto {
+    performAction(id: string, user: User, action: string, amount?: number): TableActionResponseDto {
         const table = this.tables.find((table: any) => table.id === parseInt(id));
         
         if (!table) {
@@ -227,10 +228,12 @@ export class TablesService {
             };
         }
 
-        const player = table.players.find((player: any) => player.id === playerId);
+        const player = table.players.find((player: any) => player.id === user.id);
         
         if (!player) {
+            console.log("user dans performAction", );
             return {
+                
                 success: false,
                 error: 'Player not found'
             };
