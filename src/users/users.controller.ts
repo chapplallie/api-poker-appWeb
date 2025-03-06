@@ -1,7 +1,6 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, ParseIntPipe, UsePipes, ValidationPipe } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
-//import { UpdateUserDto } from './dto/update-user.dto';
 
 @Controller('users')
 export class UsersController {
@@ -14,7 +13,6 @@ export class UsersController {
 
   
   @Get(':id')
-  //changer le any svp lol
   getUserById(@Param('id') id: number): any {
     return this.usersService.getUserById(id);
   }
@@ -31,12 +29,6 @@ export class UsersController {
   //   @Body() UpdateUserDto: UpdateUserDto) {
   //   return this.usersService.updatebank(id, UpdateUserDto.bank);
   // }
-
-//   @Post('login')
-//   @UsePipes(new ValidationPipe({ forbidNonWhitelisted:true, groups: ["login"]}))
-//   signIn(@Body() body: CreateUserDto) {
-//     return body;
-// }
 
 }
 

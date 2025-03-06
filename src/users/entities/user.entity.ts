@@ -23,10 +23,4 @@ export class User{
     @Min(0) 
     victoryStats: number;
 
-      
-//pour ajouter victory table => suppr db.sqlite + npm install @nestjs/typeorm typeorm sqlite3
-    // @Column()
-    // @Min(0)
-    // victoryStats: number;
-
 }
