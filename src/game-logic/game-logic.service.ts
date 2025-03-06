@@ -2,7 +2,6 @@ import { Inject, Injectable, forwardRef } from '@nestjs/common';
 import { DecksService } from '../decks/decks.service';
 import { PlayersService } from '../players/players.service';
 import { ActionsService } from '../actions/actions.service';
-import { GameLogEntry } from '../tables/dto/tables.dto';
 
 @Injectable()
 export class GameLogicService {
@@ -13,14 +12,11 @@ export class GameLogicService {
         private readonly actionsService: ActionsService,
     ) {}
 
-    // Méthode pour ajouter une entrée au journal de la table
     private addLogEntry(table: any, type: 'action' | 'turn' | 'round' | 'cards' | 'pot', message: string, data?: any): void {
-        // Initialiser le journal s'il n'existe pas
         if (!table.gameLog) {
             table.gameLog = [];
         }
         
-        // Ajouter l'entrée
         table.gameLog.push({
             timestamp: new Date(),
             type,
@@ -309,8 +305,8 @@ export class GameLogicService {
         const nextPlayerPos = (bigBlindPos + 1) % table.players.length;
         table.players[nextPlayerPos].isCurrentPlayer = true;
         
-        this.playersService.placeBet(table.players[smallBlindPos], table.currentBlind, table);
-        this.playersService.placeBet(table.players[bigBlindPos], table.currentBlind * 2, table);
+        this.playersService.placeBet(table.players[smallBlindPos], table.smallBlind, table);
+        this.playersService.placeBet(table.players[bigBlindPos], table.bigBlind, table);
     }
 
     rotateRole(table: any): void {

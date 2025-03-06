@@ -30,23 +30,23 @@ export class TablesController {
     @Post(':id')
     async joinOrLeaveTable(
 
-        @GetUser('sub') userId: number,
+        @GetUser() user: User,
         @Param('id') id: string,
         @Body() body: { action: string }
 
     ): Promise<TableActionResponseDto>{
-        let user = await this.UsersService.getUserById(userId);
+        let userCurrent = await this.UsersService.getUserById(user.id);
 
-        console.log("user : ", user);
+        console.log("userCurrent : ", userCurrent);
 
-        if (!user) {
+        if (!userCurrent) {
             throw new BadRequestException('le user est undefined');
         }
         
         if (body.action === 'join') {
-            return this.tablesService.joinTable(id, user);
+            return this.tablesService.joinTable(id, userCurrent);
         } else if (body.action === 'leave') {
-            return this.tablesService.leaveTable(id, user);
+            return this.tablesService.leaveTable(id, userCurrent);
         }
          throw new BadRequestException('Invalid action. Must be "join" or "leave"');
     }
