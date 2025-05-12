@@ -18,6 +18,7 @@ L'API offre des fonctionnalités pour rejoindre/quitter des tables, démarrer de
 - [TypeORM](https://typeorm.io/) v0.3.21 - ORM
 - [JWT](https://jwt.io/) v11.0.0 - Authentification
 - [Swagger](https://swagger.io/) v11.0.6 - Documentation API
+- [Docker](https://www.docker.com/) - Conteneurisation
 
 ## Installation
 
@@ -25,8 +26,9 @@ L'API offre des fonctionnalités pour rejoindre/quitter des tables, démarrer de
 
 - [Node.js](https://nodejs.org/) (v14+)
 - [NPM](https://www.npmjs.com/) ou [Yarn](https://yarnpkg.com/)
+- [Docker](https://www.docker.com/) et [Docker Compose](https://docs.docker.com/compose/) (optionnel)
 
-### Étapes d'installation
+### Installation standard
 
 ```bash
 # Cloner le dépôt
@@ -39,7 +41,25 @@ cd poker-api-mds
 npm install
 ```
 
+### Installation avec Docker
+
+```bash
+# Cloner le dépôt
+git clone https://github.com/votre-repo/poker-api-mds.git
+
+# Accéder au répertoire
+cd poker-api-mds
+
+# Construire et démarrer les conteneurs Docker
+docker-compose up -d
+
+# Pour arrêter les conteneurs
+docker-compose down
+```
+
 ## Compile et exécution du projet
+
+### Exécution standard
 
 ```bash
 # Mode développement
@@ -50,6 +70,19 @@ npm run start:dev
 
 # Mode production
 npm run start:prod
+```
+
+### Exécution avec Docker
+
+```bash
+# Démarrer en mode développement
+docker-compose up api
+
+# Démarrer en mode production
+docker-compose up api-prod
+
+# Exécuter en arrière-plan
+docker-compose up -d
 ```
 
 ### Accéder à la documentation Swagger
