@@ -18,6 +18,7 @@ import { Public } from './decorators/public';
     constructor(private authService: AuthService) {}
   
     @HttpCode(HttpStatus.OK)
+    @Public()
     @Post('login')
     async signIn(@Body() signInDto: Record<string, any>) {
       return this.authService.signIn(signInDto.pseudo, signInDto.password);

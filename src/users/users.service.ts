@@ -19,26 +19,25 @@ export class UsersService {
     return user;
   }
 
-  async create(userData: CreateUserDto): Promise<User> {
-    const verifyUserEmail = await this.repo.findOne({where: {email: userData.email}});
-
-    if (verifyUserEmail) {
-        throw new Error("email déjà utilisé.");
-    }
-
-    if(userData.password){
-      const saltOrRounds = 10;
-      const password = userData.password;
-      const hash = await bcrypt.hash(password, saltOrRounds);
-      userData.password = hash;
-      const newUser = userData;
-      let user = this.repo.create(newUser);
-      return this.repo.save(userData);
-    }
-    else{
-      throw new Error("mot de passe requis.");
-    }
+async create(userData: CreateUserDto): Promise<User> {
+  const verifyUserEmail = await this.repo.findOne({ where: { email: userData.email } });
+  if (verifyUserEmail) {
+    throw new Error("email déjà utilisé.");
   }
+  if (!userData.password) {
+    throw new Error("mot de passe requis.");
+  }
+
+  const saltOrRounds = 10;
+  const hash = await bcrypt.hash(userData.password, saltOrRounds);
+
+  const newUser = this.repo.create({
+    ...userData,
+    password: hash,
+  });
+  console.log("newUser", newUser);
+  return this.repo.save(newUser);
+}
 
   async findOne(pseudo: string): Promise<User | null> {
 

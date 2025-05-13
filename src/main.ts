@@ -5,6 +5,13 @@ import { LoggerInterceptorInterceptor } from './logger-interceptor/logger-interc
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+
+   app.enableCors({
+    origin: '*',
+    credentials: true,
+    methods: "GET, POST, PUT, DELETE",
+  });
+2
   const config = new DocumentBuilder()
     .setTitle('poker API')
     .setDescription('poker API ')
@@ -14,6 +21,6 @@ async function bootstrap() {
   const documentFactory = () => SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, documentFactory);
   app.useGlobalInterceptors(new LoggerInterceptorInterceptor())
-  await app.listen(process.env.PORT ?? 3000);
+  await app.listen(3000);
 }
 bootstrap();
