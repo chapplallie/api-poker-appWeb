@@ -25,7 +25,7 @@ export class PlayersService {
     check(player: Player, table: TableDto): void {
         // Vérifie si le check est possible
         if(player.currentBet !== table.currentBet){
-            throw new Error("votre mise n'est pas egale a la mise la plus haute de la table")
+            throw new Error("votre mise n'est pas égale à la mise la plus haute de la table")
         }
         // Enregistre l'action
         player.hasPlayed = true;
@@ -34,7 +34,7 @@ export class PlayersService {
     call(player: Player, table: TableDto): void {
         // Vérifie si le call est possible
         if(player.currentBet == table.currentBet){
-            throw new Error("votre mise est déjà egale a la mise la plus haute de la table")
+            throw new Error("votre mise est déjà égale à la mise la plus haute de la table")
         }
 
         let call = table.currentBet - player.currentBet;
@@ -56,7 +56,7 @@ export class PlayersService {
 
     IsAllIn(player: Player, table: TableDto): boolean{
         if(player.chips <= 0){
-            throw new Error("sans chips vous ne pouvez pas faire tapis")
+            throw new Error("Sans chips vous ne pouvez pas faire tapis")
         }
         table.currentBet+= player.chips;
         table.pot += player.chips;
