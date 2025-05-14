@@ -16,7 +16,7 @@ export class CardDto {
 export class TableDto {
   id: number;
   name: string;
-  status: 'Waiting' | 'Ongoing' | 'Finished';
+  status: 'En attente' | 'En cours' | 'Terminée';
   round: number;
   turn: number;
   currentBlind: number;

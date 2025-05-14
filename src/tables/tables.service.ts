@@ -7,8 +7,8 @@ import { User } from 'src/users/entities/user.entity';
 export class TablesService {
     tables: TableDto[] = [{
         id: 1,
-        name: "Beginner Table",
-        status: "Waiting",
+        name: "Bernard Tapis d'Eveil",
+        status: "En attente",
         round: 1,
         turn: 1,
         currentBlind: 25,
@@ -25,8 +25,8 @@ export class TablesService {
     },
     {
         id: 2,
-        name: "Intermediate Table",
-        status: "Waiting", 
+        name: "Sous la moquette",
+        status: "En attente", 
         round: 1,
         turn: 1,
         currentBlind: 50,
@@ -43,8 +43,8 @@ export class TablesService {
     },
     {
         id: 3,
-        name: "Advanced Table",
-        status: "Waiting", 
+        name: "Bernard ULTIMATE Tapis",
+        status: "En attente", 
         round: 1,
         turn: 1,
         currentBlind: 100,
@@ -79,20 +79,20 @@ export class TablesService {
         if (!table) {
             return {
                 success: false,
-                error: 'Table not found'
+                error: 'Table non trouvée'
             };
         }
         
         if (table.players.some(player => player.id === user.id)) {
             return {
                 success: false,
-                error: 'Player already joined this table'
+                error: 'Un joueur a déjà rejoint cette table'
             };
         }
         
         table.players.push({
             id: user.id,
-            name: user.pseudo || "Player " + user.id,
+            name: user.pseudo || "Joueur " + user.id,
             chips: user.bank,
             hand: [],
             tableId: table.id,
@@ -123,7 +123,7 @@ export class TablesService {
         if (!table) {
             return {
                 success: false,
-                error: 'Table not found'
+                error: 'Table non trouvée'
             };
         }
         
@@ -131,7 +131,7 @@ export class TablesService {
         if (!playerExists) {
             return {
                 success: false,
-                error: 'Player not found at this table'
+                error: 'Joueur non trouvé dans la table'
             };
         }
         
@@ -151,7 +151,7 @@ export class TablesService {
         if (!table) {
             return {
                 success: false,
-                error: 'Table not found'
+                error: 'Table non trouvée'
             };
         }
         
@@ -159,7 +159,7 @@ export class TablesService {
         if (!playerExists) {
             return {
                 success: false,
-                error: 'Player must join the table before starting the game'
+                error: 'Un joueur doit être présent pour démarrer la partie'
             };
         }
         
@@ -168,14 +168,14 @@ export class TablesService {
             this.addAIPlayers(table, aiPlayersToAdd);
         }
         
-        if (table.status === 'Ongoing') {
+        if (table.status === 'En cours') {
             return {
                 success: false,
-                error: 'Game is already in progress'
+                error: 'La partie est déjà en cours'
             };
         }
         
-        table.status = 'Ongoing';
+        table.status = 'En cours';
         
         const gameState = this.gameLogicService.initializeGame(table);
         
@@ -224,7 +224,7 @@ export class TablesService {
         if (!table) {
             return {
                 success: false,
-                error: 'Table not found'
+                error: 'Table non trouvée'
             };
         }
 
@@ -235,7 +235,7 @@ export class TablesService {
             return {
                 
                 success: false,
-                error: 'Player not found'
+                error: 'Joueur non trouvé'
             };
         }
         
